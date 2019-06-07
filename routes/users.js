@@ -11,7 +11,7 @@ const saltRounds = 10;
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.get('/hello', function(req, res, next){
-   res.send('test5')
+   res.send('test6')
 })
 
 router.post("/authenticate/", function(req, res, next){
@@ -46,11 +46,11 @@ router.post("/addUser", function(req, res){
    const password = bcrypt.hashSync(req.body.password, saltRounds);
 
    let isAdmin = false;
-   let userObject = { username, password, email, company, isAdmin};
+   let userObject = { username, password, email, company, isAdmin };
 
 
    // connect to atlas
-   res.send(JSON.stringify(userObject));
+   res.send("error below line 53");
    mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
       if (err) next(err);
 
