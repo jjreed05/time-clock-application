@@ -11,102 +11,94 @@ const saltRounds = 10;
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.get('/hello', function(req, res, next){
-    res.send("Hello World");
+   res.write('H');
+   res.write('I');
+   res.write('!');
+   res.send("Hello World");
 })
 
 router.post("/authenticate/", function(req, res, next){
-    var username = req.body.username.toString();
-    var password = req.body.password.toString();
+   var username = req.body.username.toString();
+   var password = req.body.password.toString();
 
-    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
-        if (err) throw err;
+   mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
+         if (err) next(err);
 
-        const collection = client.db("usersDb").collection("userInformation");
-        collection.findOne({
+         const collection = client.db("usersDb").collection("userInformation");
+         collection.findOne({
             $or: [
-                { "username": username },
-                { "email": username }
+               { "username": username },
+               { "email": username }
             ]
-        }, (error, user) => {
-            if (error) {
-                return res.status(400).send(error);
-            }
+         }, (error, user) => {
+            if (err) next(err);
             if (!user)
-                return res.send(false);
+               return res.send(user);
             if (!bcrypt.compareSync(password, user.password))
-                return res.status(400).send(false);
-            res.send({
-                "id": user._id,
-                "username": user.username,
-                "email": user.email,
-                "company": user.company,
-                "isAdmin": false,
-            });
+               return res.status(400).send(false);
+            res.send(user);
         });
         client.close();
     });
 });
 
 router.post("/addUser", function(req, res){
-    const username = req.body.username;
-    const email = req.body.email;
-    const company = req.body.company;
-    const password = bcrypt.hashSync(req.body.password, saltRounds);
-    let   isAdmin = false;
-    let myObject = { username, password, email, company, isAdmin};
+   const username = req.body.username;
+   const email = req.body.email;
+   const company = req.body.company;
+   const password = bcrypt.hashSync(req.body.password, saltRounds);
 
-    // connect to atlas
-    mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
-        if (err) throw err;
+   let isAdmin = false;
+   let userObject = { username, password, email, company, isAdmin};
+   res.write(userObject);
 
-        // determine if company already exists
-        let companyExists;
-        const companyInformation = client.db("userDb").collection("companyInformation");
-        await companyInformation.findOne({ "name": company}, (error, company) => {
-            if (error) {
-                return res.status(400).send(error);
-            }
-            companyExists = !!company; // the bang! bang! should convert the company object to a boolean
-        });
+   // connect to atlas
+   mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
+      if (err) next(err);
 
-        // some things need to happen if the company is new
-        if (!companyExists){
+      // determine if company already exists
+      let companyExists;
+      const companyInformation = client.db("userDb").collection("companyInformation");
+      await companyInformation.findOne({ "name": company}, (error, company) => {
+            if (err) next(err);
+            companyExists = !!company; // the bang! bang! should convert the company object to a boolean 
+      });
 
-            // first the new user should be admin
-            isAdmin = true;
-            myObject = { username, password, email, company, isAdmin };
+      // some things need to happen if the company is new
+      if (!companyExists){
 
-            // and add the new company to the company collection
-            let name = company;
-            let anotherObject = { name };
-            companyInformation.insertOne(anotherObject, (error, result) => {
-                if (error) throw error;
-                console.log("added company: " + company);
-            })
-        }
+         // first the new user should be admin
+         isAdmin = true;
+         userObject = { username, password, email, company, isAdmin };
 
-        const userInformation = client.db("usersDb").collection("userInformation");
-        userInformation.findOne({
-            $or: [
-                { "username": username },
-                { "email": username }
-            ]
-        }, (error, user) => {
-            if (error) {
-                return res.status(400).send(error);
-            }
-            if (!user){
-                userInformation.insertOne(myObject, function(error, result){
-                    if (error) throw error;
-                    console.log("added the user");
-                    res.send(result.insertedId); // can we change this to return a user?
-                });
-            }
-            else {
-                res.status(400).send(error);
-            }
-        });
-        client.close();
+         // and add the new company to the company collection
+         let name = company;
+         let anotherObject = { name };
+         companyInformation.insertOne(anotherObject, (error, result) => {
+            if (err) next(err);
+         })
+      }
+
+      const userInformation = client.db("usersDb").collection("userInformation");
+      userInformation.findOne({
+         $or: [
+            { "username": username },
+            { "email": username }
+         ]
+      }, (error, user) => {
+         if (err) next(err);
+         if (!user){
+            userInformation.insertOne(userObject, function(error, result){
+               if (err) next(err);
+               console.log("added the user");
+               res.send(result.insertedId); // can we change this to return a user?
+            });
+         }
+         else {
+             if (err) next(err);
+         }
+      });
+      client.close();
     });
 });
 
