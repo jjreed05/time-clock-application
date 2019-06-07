@@ -50,9 +50,10 @@ router.post("/addUser", function(req, res){
 
    let isAdmin = false;
    let userObject = { username, password, email, company, isAdmin};
-   res.write(userObject);
+
 
    // connect to atlas
+   res.send(userObject);
    mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
       if (err) next(err);
 
