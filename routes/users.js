@@ -79,27 +79,28 @@ router.post("/addUser", function(req, res){
       }
 
       // no error above this line
-
+      // make sure there is no user with that username or email first
+      let userExists = null;
       const userInformation = client.db("usersDb").collection("userInformation");
-      userInformation.findOne({
+      await userInformation.findOne({
          $or: [
             { "username": username },
             { "email": username }
          ]
       }, (error, user) => {
          if (err) next(err);
-         if (!user){
-            res.send("error below line 92");
-            userInformation.insertOne(userObject, function(error, result){
-               if (err) next(err);
-               console.log("added the user");
-               res.send(result.insertedId); // can we change this to return a user?
-            });
-         }
-         else {
-             if (err) next(err);
-         }
+         userExists = user;
       });
+      res.send(userExists);
+
+      if (!userExists){
+         userInformation.insertOne(userObject, function(error, result){
+            if (err) next(err);
+            res.send(result.insertedId); // can we change this to return a user?
+         });
+      }  
+
+
       client.close();
     });
 });
