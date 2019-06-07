@@ -43,6 +43,7 @@ router.post("/authenticate/", function(req, res, next){
 });
 
 router.post("/addUser", function(req, res){
+   res.send("hits endpoint");
    const username = req.body.username;
    const email = req.body.email;
    const company = req.body.company;
