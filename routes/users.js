@@ -14,7 +14,7 @@ router.get('/hello', function(req, res, next){
    res.write('H');
    res.write('I');
    res.write('!');
-   res.send("Hello World");
+   res.send("Wazzup!!!?");
 })
 
 router.post("/authenticate/", function(req, res, next){
