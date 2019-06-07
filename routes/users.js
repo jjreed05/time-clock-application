@@ -11,10 +11,7 @@ const saltRounds = 10;
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.get('/hello', function(req, res, next){
-   res.write('H');
-   res.write('I');
-   res.write('!');
-   res.send("Wazzup!!!?");
+   res.send('test3')
 })
 
 router.post("/authenticate/", function(req, res, next){
