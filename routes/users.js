@@ -61,7 +61,7 @@ router.post("/addUser", function(req, res){
             companyExists = !!company; // the bang! bang! should convert the company object to a boolean 
       });
 
-      // no above below this line
+      // no error above this line
 
       // some things need to happen if the company is new
       if (!companyExists){
@@ -78,7 +78,7 @@ router.post("/addUser", function(req, res){
          })
       }
 
-      res.send("error below line 81");
+      // no error above this line
 
       const userInformation = client.db("usersDb").collection("userInformation");
       userInformation.findOne({
