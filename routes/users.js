@@ -11,7 +11,7 @@ const saltRounds = 10;
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.get('/hello', function(req, res, next){
-   res.send('test3')
+   res.send('test4')
 })
 
 router.post("/authenticate/", function(req, res, next){
@@ -40,7 +40,6 @@ router.post("/authenticate/", function(req, res, next){
 });
 
 router.post("/addUser", function(req, res){
-   res.send("hits endpoint");
    const username = req.body.username;
    const email = req.body.email;
    const company = req.body.company;
@@ -51,7 +50,7 @@ router.post("/addUser", function(req, res){
 
 
    // connect to atlas
-   res.send(userObject);
+   res.json(userObject);
    mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
       if (err) next(err);
 
