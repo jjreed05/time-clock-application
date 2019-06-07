@@ -51,15 +51,17 @@ router.post("/addUser", function(req, res){
 
    // connect to atlas
    mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
-      if (err) next(err);
+      if (err) throw Error("start of connect");
 
       // determine if company already exists
       let companyExists;
       const companyInformation = client.db("userDb").collection("companyInformation");
       await companyInformation.findOne({ "name": company}, (error, company) => {
-            if (err) next(err);
+            if (err) throw Error("start of connect");
             companyExists = !!company; // the bang! bang! should convert the company object to a boolean 
       });
+
+      res.send("error below line 64");
 
       // some things need to happen if the company is new
       if (!companyExists){
@@ -76,6 +78,8 @@ router.post("/addUser", function(req, res){
          })
       }
 
+      res.send("error below line 81");
+
       const userInformation = client.db("usersDb").collection("userInformation");
       userInformation.findOne({
          $or: [
@@ -85,6 +89,7 @@ router.post("/addUser", function(req, res){
       }, (error, user) => {
          if (err) next(err);
          if (!user){
+            res.send("error below line 92");
             userInformation.insertOne(userObject, function(error, result){
                if (err) next(err);
                console.log("added the user");
