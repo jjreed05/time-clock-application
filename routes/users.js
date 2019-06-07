@@ -61,7 +61,7 @@ router.post("/addUser", function(req, res){
             companyExists = !!company; // the bang! bang! should convert the company object to a boolean 
       });
 
-      res.send("error below line 64");
+      // no above below this line
 
       // some things need to happen if the company is new
       if (!companyExists){
