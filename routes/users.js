@@ -96,10 +96,6 @@ router.post("/addUser", function(req, res){
                  if (err) throw err;
                  res.send(user);
              });*/
-         }
-         else {
-             res.status(400).send("User exists");
-         }
       });
 
 
