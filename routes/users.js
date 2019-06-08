@@ -39,6 +39,15 @@ router.post("/authenticate/", function(req, res, next){
     });
 });
 
+router.post("/updateUser", function(req, res){
+   const username = req.body.username;
+   const email = req.body.email;
+})
+
+router.post("/deleteUser", function(req, res){
+   
+})
+
 router.post("/addUser", function(req, res){
    const username = req.body.username;
    const email = req.body.email;
