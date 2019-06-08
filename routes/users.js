@@ -107,7 +107,7 @@ router.post("/addUser", function(req, res){
           });
       }
 
-      res.send("insertResult");
+      res.send(insertResult);
       client.close();
     });
 });
