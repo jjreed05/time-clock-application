@@ -74,7 +74,7 @@ router.post("/addUser", function(req, res){
          let name = company;
          let anotherObject = { name };
          companyInformation.insertOne(anotherObject, (error, result) => {
-            if (err) next(err);
+            if (err) throw (err);
          })
       }
 
@@ -88,10 +88,10 @@ router.post("/addUser", function(req, res){
             { "email": username }
          ]
       }, (error, user) => {
-         if (error) next(error);
+         if (error) throw(error);
          if (!user) {
              userInformation.insertOne(userObject, function(error, result){
-                 if (error) next (error);
+                 if (error) throw (error);
                  res.send(user);
              });
          }
