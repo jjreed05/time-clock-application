@@ -88,10 +88,11 @@ router.post("/addUser", function(req, res){
             { "email": username }
          ]
       }, (error, user) => {
-         if (error) throw(error);
-         if (!user) {
-             userInformation.insertOne(userObject, function(error, result){
-                 if (error) throw (error);
+         if (error) throw error;
+
+         if(!user) {
+             userInformation.insertOne(userObject, function (err, result) {
+                 if (err) throw err;
                  res.send(user);
              });
          }
