@@ -74,7 +74,7 @@ router.post("/addUser", function(req, res){
          let name = company;
          let anotherObject = { name };
          companyInformation.insertOne(anotherObject, (error, result) => {
-            if (err) next(err);
+            if (err) throw (err);
          })
       }
 
@@ -88,19 +88,18 @@ router.post("/addUser", function(req, res){
             { "email": username }
          ]
       }, (error, user) => {
-         if (err) next(err);
-         userExists = user;
+         if (error) throw(error);
+         if (!user) {
+             userInformation.insertOne(userObject, function(error, result){
+                 if (error) throw (error);
+                 res.send(user);
+             });
+         }
+         else {
+             res.status(400).send("User exists");
+         }
       });
-      // error above this line
-
-      if (!userExists){
-         userInformation.insertOne(userObject, function(error, result){
-            if (err) next(err);
-            res.send(result.insertedId); // can we change this to return a user?
-         });
-      }  
-
-
+      
       client.close();
     });
 });
