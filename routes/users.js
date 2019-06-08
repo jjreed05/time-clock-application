@@ -91,14 +91,15 @@ router.post("/addUser", function(req, res){
          if (error) next(error);
          userExists = user;
       });
-      res.send(userExists);
 
       if (!userExists){
          userInformation.insertOne(userObject, function(error, result){
             if (err) next(err);
-            res.send(result.insertedId); // can we change this to return a user?
+            res.send(result); // can we change this to return a user?
          });
-      }  
+      }  else {
+          res.status(400).send("User exists");
+      }
 
       console.log(userExists);
       client.close();
