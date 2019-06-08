@@ -90,7 +90,7 @@ router.post("/addUser", function(req, res){
       }, (error, user) => {
          if (error) throw error;
 
-         res.send(user);
+         res.send("help");
          /*if(!user) {
              userInformation.insertOne(userObject, function (err, result) {
                  if (err) throw err;
