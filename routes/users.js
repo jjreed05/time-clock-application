@@ -94,7 +94,7 @@ router.post("/addUser", function(req, res){
              userExists = false;
          }
          else {
-             userExists = user;
+             userExists = true;
          }
       });
 
