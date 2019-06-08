@@ -100,7 +100,7 @@ router.post("/addUser", function(req, res){
          });
       }  
 
-
+      console.log(userExists);
       client.close();
     });
 });
