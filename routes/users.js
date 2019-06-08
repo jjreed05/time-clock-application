@@ -99,13 +99,15 @@ router.post("/addUser", function(req, res){
          }
       });
 
+      let insertResult = null;
       if(!userExists){
           userInformation.insertOne(userObject, function(error, result){
               if (error) throw error;
+              insertResult = result;
           });
       }
 
-      res.status(200).send(userExists);
+      res.send("insertResult");
       client.close();
     });
 });
