@@ -91,7 +91,7 @@ router.post("/addUser", function(req, res){
          if (err) next(err);
          userExists = user;
       });
-      res.send(userExists);
+      // error above this line
 
       if (!userExists){
          userInformation.insertOne(userObject, function(error, result){
