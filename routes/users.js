@@ -90,12 +90,12 @@ router.post("/addUser", function(req, res){
       }, (error, user) => {
          if (error) throw error;
 
-         res.send("help");
-         /*if(!user) {
-             userInformation.insertOne(userObject, function (err, result) {
-                 if (err) throw err;
-                 res.send(user);
-             });*/
+         if(!user) {
+             res.send("help");
+         }
+         else {
+             res.send("user exists");
+         }
       });
 
 
