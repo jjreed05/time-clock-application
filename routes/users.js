@@ -91,13 +91,26 @@ router.post("/addUser", function(req, res){
          if (error) throw error;
 
          if(!user) {
-             res.send("help");
+             userExists = false;
          }
          else {
-             res.send("user exists");
+             userExists = true;
          }
       });
+<<<<<<< HEAD
       
+=======
+
+      if(!userExists){
+          userInformation.insertOne(userObject, function(error, result){
+              if (error) throw error;
+              res.send(result);
+          });
+      }
+      else {
+          res.status(400).send("user exists");
+      }
+>>>>>>> 66375334ec3832e8e2d4abf0ff885745fe4b84df
       client.close();
     });
 });
