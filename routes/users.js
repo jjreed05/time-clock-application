@@ -88,7 +88,7 @@ router.post("/addUser", function(req, res){
             { "email": username }
          ]
       }, (error, user) => {
-         if (err) next(err);
+         if (error) next(error);
          userExists = user;
       });
       res.send(userExists);
