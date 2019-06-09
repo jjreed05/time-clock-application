@@ -90,11 +90,10 @@ router.post("/addUser", function(req, res){
               else {
                   userExists = true;
               }
+              res.send("User exists: " + userExists);
+
+              client.close();
        });
-
-       res.send("User exists: " + userExists);
-
-      client.close();
     });
 });
 
