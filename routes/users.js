@@ -93,15 +93,14 @@ router.post("/addUser", function(req, res){
 
          if(!user) {
              userExists = false;
-             res.send("UserExists: " + userExists);
          }
          else {
              userExists = true;
-             res.send("UserExists: " + userExists);
          }
       });
 
-      if(!userExists){
+       res.send("UserExists: " + userExists);
+      /*if(!userExists){
           userInformation.insertOne(userObject, function(error, result){
               if (error) throw error;
               res.send(result);
@@ -109,7 +108,7 @@ router.post("/addUser", function(req, res){
       }
       else {
           res.status(400).send("user exists");
-      }
+      }) */
       client.close();
     });
 });
