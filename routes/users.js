@@ -102,6 +102,7 @@ router.post("/updateUser", function(req, res){
 router.post("/deleteUser", function(req, res){
    const userId = req.body.userId.toString();
 
+
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
       if (err) next(err);
 
@@ -157,12 +158,24 @@ router.post("/addUser", function(req, res){
 
       // add user to the db
       const userInformation = client.db("usersDb").collection("userInformation");
+      const timeTable = client.db("usersDb").collection("timeTable");
       await userInformation.findOne(
           {$or: [{ "username": username }, { "email": email }]}, function (err, user) {
               if (!user) {
                   userInformation.insertOne(userObject, function(err, result){
                       if (err) throw err;
-                      res.send(result.ops);
+
+                      // set up the time table
+                      const userId = result.ops._id;
+                      const isWorking = false;
+                      const time = {};
+                      const timeObj = { userId, isWorking, time };
+
+                      // insert time table
+                      timeTable.insertOne(timeObj, function(err, result1){
+                          if(err) throw err;
+                          res.send(result.ops);
+                      });
                   });
               }
               else {
