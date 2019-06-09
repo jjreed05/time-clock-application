@@ -132,7 +132,7 @@ router.post("/addUser", function(req, res){
 
       // determine if company already exists
       let companyExists;
-      const companyInformation = client.db("userDb").collection("companyInformation");
+      const companyInformation = client.db("usersDb").collection("companyInformation");
       await companyInformation.findOne({ "name": company}, (error, company) => {
             if (err) throw Error("start of connect");
             companyExists = !!company; // the bang! bang! should convert the company object to a boolean 
@@ -159,9 +159,20 @@ router.post("/addUser", function(req, res){
       // make sure there is no user with that username or email first
       var userExists = null;
       const userInformation = client.db("usersDb").collection("userInformation");
-      res.send(await userInformation.find({"username" : username}));
-      
-      client.close();
+      await userInformation.findOne(
+          {$or: [{ "username": username }, { "email": email }]}, function (err, user) {
+              if (!user) {
+                  userInformation.insertOne(userObject, function(err, result){
+                      if (err) throw err;
+                      res.send(result.ops);
+                  });
+              }
+              else {
+                  res.status(400).send("User exists");
+              }
+
+              client.close();
+       });
     });
 });
 
