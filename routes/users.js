@@ -85,13 +85,15 @@ router.post("/addUser", function(req, res){
       await userInformation.findOne(
           {$or: [{ "username": username }, { "email": email }]}, function (err, user) {
               if (!user) {
-                  userExists = false;
+                  userInformation.insertOne(userObject, function(err, result){
+                      if (err) throw err;
+                      res.send(result);
+                  });
               }
               else {
-                  userExists = true;
+                  res.status(400).send("User exists!")
               }
-              res.send("User exists: " + userExists);
-
+              
               client.close();
        });
     });
