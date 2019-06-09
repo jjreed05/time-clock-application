@@ -166,8 +166,8 @@ router.post("/addUser", function(req, res){
                       if (err) throw err;
 
                       // set up the time table
-                      const userInformation = result.insertedId;
-                      const userId = result.ops._id;
+                      const userInformation = result.ops;
+                      const userId = result.insertedId;
                       const isWorking = false;
                       const time = {};
                       const timeObj = { userId, isWorking, time };
