@@ -18,8 +18,8 @@ router.post("/authenticate/", function(req, res, next){
    const username = req.body.username.toString();
    const password = req.body.password.toString();
 
-   mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
-      if (err) next(err);
+   mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
+      if (err) throw err;
 
       const collection = client.db("usersDb").collection("userInformation");
       collection.findOne({
@@ -28,7 +28,7 @@ router.post("/authenticate/", function(req, res, next){
             { "email": username }
          ]
       }, (error, user) => {
-         if (error) next(error);
+         if (error) throw err;
          if (!user)
             return res.status(400).send(false);
          if (!bcrypt.compareSync(password, user.password))
@@ -40,15 +40,15 @@ router.post("/authenticate/", function(req, res, next){
 });
 
 // get all users in company
-router.post("/getCompanyUsers", function (req, res){
-   const company = req.body.company.toString();
+router.get("/getCompanyUsers", function (req, res){
+   const company = req.params.company.toString();
 
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
-      if (err) next(err);
+      if (err) throw err;
 
       const collection = client.db("usersDb").collection("userInformation");
       collection.find({ "company": company}, (error, users) => {
-         if (error) next(error);
+         if (error) throw err;
          if (!users)
             return res.status(400).send(false);
          res.send(users);
@@ -58,15 +58,15 @@ router.post("/getCompanyUsers", function (req, res){
 })
 
 // get user by id
-router.post("/getUser", function(req, res){
-   const userId = req.body.userId.toString();
+router.get("/getUser", function(req, res){
+   const userId = req.params.userId.toString();
    
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
-      if (err) next(err);
+      if (err) throw err;
 
       const collection = client.db("usersDb").collection("userInformation");
       collection.find({"_id": ObjectId(userId)}, (error, user) => {
-         if (error) next(error);
+         if (error) throw err;
          if (!user)
             return res.status(400).send(false);
          res.send(user);
@@ -85,11 +85,11 @@ router.post("/updateUser", function(req, res){
    let userObject = { username, password, email, company, isAdmin };
 
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
-      if (err) next(err);
+      if (err) throw err;
 
       const collection = client.db("usersDb").collection("userInformation");
       collection.update({"_id": ObjectId(userId)}, userObject, (error, result) => {
-         if (error) next(error);
+         if (error) throw err;
          if (!result)
             return res.status(400).send(false);
          res.send(result);
@@ -99,15 +99,15 @@ router.post("/updateUser", function(req, res){
 })
 
 //delete user by id
-router.post("/deleteUser", function(req, res){
+router.delete("/deleteUser", function(req, res){
    const userId = req.body.userId.toString();
 
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
-      if (err) next(err);
+      if (err) throw err;
 
       const collection = client.db("usersDb").collection("userInformation");
       collection.deleteOne({"_id": ObjectId(userId)}, (error, result) => {
-         if (error) next(error);
+         if (error) throw error;
          if (!result)
             return res.status(400).send(false);
          res.send(result);
@@ -128,7 +128,7 @@ router.post("/addUser", function(req, res){
 
    // connect to atlas
    mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
-      if (err) throw Error("start of connect");
+      if (err) throw err;
 
       // determine if company already exists
       let companyExists;
