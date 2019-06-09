@@ -11,41 +11,109 @@ const saltRounds = 10;
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.get('/hello', function(req, res, next){
-   res.send('test7');
+   res.send('whole new deal');
 })
 
 router.post("/authenticate/", function(req, res, next){
-   var username = req.body.username.toString();
-   var password = req.body.password.toString();
+   const username = req.body.username.toString();
+   const password = req.body.password.toString();
 
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
-         if (err) next(err);
+      if (err) next(err);
 
-         const collection = client.db("usersDb").collection("userInformation");
-         collection.findOne({
-            $or: [
-               { "username": username },
-               { "email": username }
-            ]
-         }, (error, user) => {
-            if (err) next(err);
-            if (!user)
-               return res.send(user);
-            if (!bcrypt.compareSync(password, user.password))
-               return res.status(400).send(false);
-            res.send(user);
-        });
-        client.close();
-    });
+      const collection = client.db("usersDb").collection("userInformation");
+      collection.findOne({
+         $or: [
+            { "username": username },
+            { "email": username }
+         ]
+      }, (error, user) => {
+         if (error) next(error);
+         if (!user)
+            return res.status(400).send(false);
+         if (!bcrypt.compareSync(password, user.password))
+            return res.status(400).send(false);
+         res.send(user);
+     });
+     client.close();
+   });
 });
 
-router.post("/updateUser", function(req, res){
-   const username = req.body.username;
-   const email = req.body.email;
+// get all users in company
+router.post("/getCompanyUsers", function (req, res){
+   const company = req.body.company.toString();
+
+   mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
+      if (err) next(err);
+
+      const collection = client.db("usersDb").collection("userInformation");
+      collection.find({ "company": company}, (error, users) => {
+         if (error) next(error);
+         if (!users)
+            return res.status(400).send(false);
+         res.send(users);
+      })
+      client.close();
+   });
 })
 
-router.post("/deleteUser", function(req, res){
+// get user by id
+router.post("/getUser", function(req, res){
+   const userId = req.body.userId.toString();
    
+   mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
+      if (err) next(err);
+
+      const collection = client.db("usersDb").collection("userInformation");
+      collection.find({"_id": ObjectId(userId)}, (error, user) => {
+         if (error) next(error);
+         if (!user)
+            return res.status(400).send(false);
+         res.send(user);
+      })
+   });
+});
+
+//update user by id
+router.post("/updateUser", function(req, res){
+   const userId = req.body.userId.toString();
+   const username = req.body.username;
+   const email = req.body.email;
+   const company = req.body.company;
+   const password = bcrypt.hashSync(req.body.password, saltRounds);
+   const isAdmin = req.body.isAdmin;
+   let userObject = { username, password, email, company, isAdmin };
+
+   mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
+      if (err) next(err);
+
+      const collection = client.db("usersDb").collection("userInformation");
+      collection.update({"_id": ObjectId(userId)}, userObject, (error, result) => {
+         if (error) next(error);
+         if (!result)
+            return res.status(400).send(false);
+         res.send(result);
+      })
+
+   });
+})
+
+//delete user by id
+router.post("/deleteUser", function(req, res){
+   const userId = req.body.userId.toString();
+
+   mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
+      if (err) next(err);
+
+      const collection = client.db("usersDb").collection("userInformation");
+      collection.deleteOne({"_id": ObjectId(userId)}, (error, result) => {
+         if (error) next(error);
+         if (!result)
+            return res.status(400).send(false);
+         res.send(result);
+      })
+
+   });
 })
 
 router.post("/addUser", function(req, res){
