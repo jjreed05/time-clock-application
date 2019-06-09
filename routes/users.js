@@ -102,6 +102,7 @@ router.post("/updateUser", function(req, res){
 router.delete("/deleteUser", function(req, res){
    const userId = req.body.userId.toString();
 
+
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
       if (err) throw err;
 
@@ -155,51 +156,38 @@ router.post("/addUser", function(req, res){
          })
       }
 
-      // no error above this line
-      // make sure there is no user with that username or email first
-      var userExists = null;
+      // add user to the db
       const userInformation = client.db("usersDb").collection("userInformation");
+      const timeTable = client.db("usersDb").collection("timeTable");
       await userInformation.findOne(
           {$or: [{ "username": username }, { "email": email }]}, function (err, user) {
               if (!user) {
                   userInformation.insertOne(userObject, function(err, result){
                       if (err) throw err;
-                      res.send(result.ops);
+
+                      // set up the time table
+                      const userInformation = result.ops;
+                      const userId = result.insertedId;
+                      const isWorking = false;
+                      const time = {};
+                      const timeObj = { userId, isWorking, time };
+
+                      // insert time table
+                      timeTable.insertOne(timeObj, function(err, result){
+                          if(err) throw err;
+                          res.send(userInformation);
+                          client.close();
+                      });
                   });
               }
               else {
                   res.status(400).send("User exists");
+                  client.close();
               }
-
-              client.close();
        });
     });
 });
 
-router.post("/addPunchIn", function(req, res) {
-    const time = req.body.time;
-    const location = req.body.location;
-    const id = req.body.id;
-    const ObjectId = mongoose.Types.ObjectId,
-        timeClock = [
-            {
-                "_id": new ObjectId(id),
-                "time": time,
-                "location": location
-            }
-        ];
-
-    // connect to atlas
-    mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
-        if(err) throw err;
-        const collection = client.db("usersDb").collection("userInformation");
-        collection.insertOne(timeClock, function(error, docs){
-            if (error) throw error;
-            res.send("success");
-        });
-        client.close();
-    });
-});
 
 
 module.exports = router;
