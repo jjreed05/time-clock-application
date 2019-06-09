@@ -55,7 +55,7 @@ router.post("/addUser", function(req, res){
 
       // determine if company already exists
       let companyExists;
-      const companyInformation = client.db("userDb").collection("companyInformation");
+      const companyInformation = client.db("usersDb").collection("companyInformation");
       await companyInformation.findOne({ "name": company}, (error, company) => {
             if (err) throw Error("start of connect");
             companyExists = !!company; // the bang! bang! should convert the company object to a boolean 
@@ -91,9 +91,9 @@ router.post("/addUser", function(req, res){
                   });
               }
               else {
-                  res.status(400).send("User exists!")
+                  res.send(user);
               }
-              
+
               client.close();
        });
     });
