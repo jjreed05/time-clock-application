@@ -78,9 +78,7 @@ router.post("/addUser", function(req, res){
          })
       }
 
-      // no error above this line
-      // make sure there is no user with that username or email first
-      var userExists = null;
+      // add user to the db
       const userInformation = client.db("usersDb").collection("userInformation");
       await userInformation.findOne(
           {$or: [{ "username": username }, { "email": email }]}, function (err, user) {
