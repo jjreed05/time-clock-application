@@ -176,6 +176,7 @@ router.post("/addUser", function(req, res){
                       timeTable.insertOne(timeObj, function(err, result){
                           if(err) throw err;
                           res.send(userInformation);
+                          client.close();
                       });
                   });
               }
