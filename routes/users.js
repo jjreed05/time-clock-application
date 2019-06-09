@@ -182,9 +182,8 @@ router.post("/addUser", function(req, res){
               }
               else {
                   res.status(400).send("User exists");
+                  client.close();
               }
-
-              client.close();
        });
     });
 });
