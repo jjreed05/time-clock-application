@@ -80,10 +80,20 @@ router.post("/addUser", function(req, res){
 
       // no error above this line
       // make sure there is no user with that username or email first
+      var userExists = null;
       const userInformation = client.db("usersDb").collection("userInformation");
-      const userExists = userInformation.find({ "username": username});
-      res.send(userExists);
-      
+      userInformation.findOne(
+          {$or: [{ "username": username }, { "email": email }]}, function (err, user) {
+              if (!user) {
+                  const userExists = false;
+              }
+              else {
+                  const userExists = true;
+              }
+              res.send("User exists: " + userExists);
+       });
+
+
       client.close();
     });
 });
