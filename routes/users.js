@@ -101,7 +101,7 @@ router.post("/addUser", function(req, res){
          }
       });
 
-      /*if(!userExists){
+      if(!userExists){
           userInformation.insertOne(userObject, function(error, result){
               if (error) throw error;
               res.send(result);
@@ -109,7 +109,7 @@ router.post("/addUser", function(req, res){
       }
       else {
           res.status(400).send("user exists");
-      }*/
+      }
       client.close();
     });
 });
