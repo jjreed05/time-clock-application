@@ -80,7 +80,7 @@ router.post("/addUser", function(req, res){
 
       // no error above this line
       // make sure there is no user with that username or email first
-      let userExists = null;
+      var userExists = null;
       const userInformation = client.db("usersDb").collection("userInformation");
       userInformation.findOne({
          $or: [
