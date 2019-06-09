@@ -87,11 +87,11 @@ router.post("/addUser", function(req, res){
               if (!user) {
                   userInformation.insertOne(userObject, function(err, result){
                       if (err) throw err;
-                      res.send(result);
+                      res.send(result.ops);
                   });
               }
               else {
-                  res.send(user);
+                  res.status(400).send("User exists");
               }
 
               client.close();
