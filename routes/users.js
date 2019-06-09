@@ -42,6 +42,7 @@ router.post("/authenticate/", function(req, res, next){
 // get all users in company
 router.get("/getCompanyUsers", function (req, res){
    const company = req.params.company.toString();
+   res.send(company);
 
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
       if (err) throw err;
@@ -52,7 +53,7 @@ router.get("/getCompanyUsers", function (req, res){
          if (!users)
             return res.status(400).send(false);
          res.send(users);
-      })
+      });
       client.close();
    });
 })
@@ -60,6 +61,7 @@ router.get("/getCompanyUsers", function (req, res){
 // get user by id
 router.get("/getUser", function(req, res){
    const userId = req.params.userId.toString();
+   res.send(userId);
    
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
       if (err) throw err;
@@ -83,6 +85,7 @@ router.post("/updateUser", function(req, res){
    const password = bcrypt.hashSync(req.body.password, saltRounds);
    const isAdmin = req.body.isAdmin;
    let userObject = { username, password, email, company, isAdmin };
+   res.send(userObject);
 
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
       if (err) throw err;
@@ -101,6 +104,7 @@ router.post("/updateUser", function(req, res){
 //delete user by id
 router.delete("/deleteUser", function(req, res){
    const userId = req.body.userId.toString();
+   res.send(userId);
 
 
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
