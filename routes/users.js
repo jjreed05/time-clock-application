@@ -166,15 +166,16 @@ router.post("/addUser", function(req, res){
                       if (err) throw err;
 
                       // set up the time table
+                      const userInformation = result.ops;
                       const userId = result.ops._id;
                       const isWorking = false;
                       const time = {};
                       const timeObj = { userId, isWorking, time };
 
                       // insert time table
-                      timeTable.insertOne(timeObj, function(err, result1){
+                      timeTable.insertOne(timeObj, function(err, result){
                           if(err) throw err;
-                          res.send(result.ops);
+                          res.send(userInformation);
                       });
                   });
               }
@@ -187,30 +188,6 @@ router.post("/addUser", function(req, res){
     });
 });
 
-router.post("/addPunchIn", function(req, res) {
-    const time = req.body.time;
-    const location = req.body.location;
-    const id = req.body.id;
-    const ObjectId = mongoose.Types.ObjectId,
-        timeClock = [
-            {
-                "_id": new ObjectId(id),
-                "time": time,
-                "location": location
-            }
-        ];
-
-    // connect to atlas
-    mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
-        if(err) throw err;
-        const collection = client.db("usersDb").collection("userInformation");
-        collection.insertOne(timeClock, function(error, docs){
-            if (error) throw error;
-            res.send("success");
-        });
-        client.close();
-    });
-});
 
 
 module.exports = router;
