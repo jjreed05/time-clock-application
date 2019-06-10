@@ -11,7 +11,7 @@ const saltRounds = 10;
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.get('/hello', function(req, res, next){
-   res.send('CRUD testing 1');
+   res.send('CRUD testing 2');
 })
 
 router.post("/authenticate/", function(req, res, next){
@@ -43,11 +43,11 @@ router.post("/authenticate/", function(req, res, next){
 router.get("/getCompanyUsers", function (req, res){
    const company = req.query.company;
 
-   mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
+   mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
       if (err) throw err;
 
       const collection = client.db("usersDb").collection("userInformation");
-      collection.find({ "company": company}, (error, users) => {
+      collection.find({ "company": company }, (error, users) => {
          if (error) throw err;
          if (!users)
             return res.status(400).send(false);
@@ -65,12 +65,13 @@ router.get("/getUser", function(req, res){
       if (err) throw err;
 
       const collection = client.db("usersDb").collection("userInformation");
-      collection.find({"_id": ObjectId(userId)}, (error, user) => {
+      collection.find({ "_id": ObjectId(userId) }, (error, user) => {
          if (error) throw err;
          if (!user)
             return res.status(400).send(false);
          res.send(user);
       })
+      client.close();
    });
 });
 
