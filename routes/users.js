@@ -41,7 +41,7 @@ router.post("/authenticate/", function(req, res, next){
 
 // get all users in company
 router.get("/getCompanyUsers", function (req, res){
-   const company = req.params.company.toString();
+   const company = req.query.company;
    res.send(company);
 
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
@@ -60,9 +60,7 @@ router.get("/getCompanyUsers", function (req, res){
 
 // get user by id
 router.get("/getUser", function(req, res){
-   res.json(req.query);
-   /*
-   const userId = req.params.userId.toString();
+   const userId = req.query.userId;
    res.send(userId);
    
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
@@ -76,7 +74,6 @@ router.get("/getUser", function(req, res){
          res.send(user);
       })
    });
-   */
 });
 
 //update user by id
