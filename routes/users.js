@@ -10,7 +10,7 @@ const saltRounds = 10;
 // here is where we will handle any database call
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
-router.get('/hello', function(req, res, next){
+router.get('/hello/', function(req, res, next){
    res.send('CRUD testing 2');
 })
 
@@ -60,6 +60,8 @@ router.get("/getCompanyUsers", function (req, res){
 // get user by id
 router.get("/getUser", function(req, res){
    const userId = req.query.userId;
+   res.send(userId);
+   /*
    
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
       if (err) throw err;
@@ -73,6 +75,8 @@ router.get("/getUser", function(req, res){
       })
       client.close();
    });
+
+   */
 });
 
 //update user by id
