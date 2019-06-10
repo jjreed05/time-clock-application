@@ -59,8 +59,13 @@ router.get("/getCompanyUsers", function (req, res){
 
 // get user by id
 router.get("/getUser", function(req, res){
-   const userId = req.query.userId;
-   res.send(userId);
+  const userId = req.query.userId;
+  res.send(userId);
+
+  mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
+    if (err) throw err;
+    client.close();
+  });
    /*
    
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
