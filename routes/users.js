@@ -60,7 +60,7 @@ router.get("/getCompanyUsers", function (req, res){
 
 // get user by id
 router.get("/getUser", function(req, res){
-   res.json(req);
+   res.json(req.query);
    /*
    const userId = req.params.userId.toString();
    res.send(userId);
