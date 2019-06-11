@@ -20,9 +20,14 @@ router.post("/addPunchIn", function(req, res){
         if (err) throw err;
 
         const collection = client.db("usersDb").collection("timeTable");
+
+        // find the user's table
         collection.findOne({ userID: id }, function(err, result){
             if (err) throw err;
-            res.send(result);
+
+            res.send(result._id);
+            // update the table
+            //collection.update({ _id: result._id})
         });
     });
 
