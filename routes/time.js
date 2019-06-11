@@ -25,9 +25,12 @@ router.post("/addPunchIn", function(req, res){
         collection.findOne({ userID: id }, function(err, result){
             if (err) throw err;
 
-            res.send(result._id);
+            //res.send(result._id);
             // update the table
-            //collection.update({ _id: result._id})
+            collection.findByIdAndUpdate(result._id, {$push: {"time": timeObj}}, function(err, result){
+                if (err) throw err;
+                res.send(result);
+            });
         });
     });
 
