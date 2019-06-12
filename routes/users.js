@@ -11,7 +11,7 @@ const saltRounds = 10;
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.get('/hello/', function(req, res, next){
-   res.send('CRUD testing 2');
+   res.send('CRUD testing 3');
 })
 
 router.post("/authenticate/", function(req, res, next){
@@ -72,22 +72,6 @@ router.get("/getUser", function(req, res){
     })
     client.close();
   });
-   /*
-   
-   mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
-      if (err) throw err;
-
-      const collection = client.db("usersDb").collection("userInformation");
-      collection.find({ "_id": ObjectId(userId) }, (error, user) => {
-         if (error) throw err;
-         if (!user)
-            return res.status(400).send(false);
-         res.send(user);
-      })
-      client.close();
-   });
-
-   */
 });
 
 //update user by id
@@ -152,10 +136,11 @@ router.post("/addUser", function(req, res){
       // determine if company already exists
       let companyExists;
       const companyInformation = client.db("usersDb").collection("companyInformation");
-      await companyInformation.findOne({ "name": company}, (error, company) => {
-            if (err) throw Error("start of connect");
-            companyExists = !!company; // the bang! bang! should convert the company object to a boolean 
+      await companyInformation.findOne({ "name": company} , (error, company) => {
+        if (err) throw Error("start of connect");
+        companyExists = !!company;
       });
+      res.send(companyExists);
 
       // no error above this line
 
