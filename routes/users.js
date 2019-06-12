@@ -64,7 +64,7 @@ router.get("/getUser", function(req, res){
   mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
     if (err) throw err;
     const collection = client.db("usersDb").collection("userInformation");
-    collection.findOne({ "email", email }, (error, user) => {
+    collection.findOne({ "email": email }, (error, user) => {
       if (error) throw err;
       if (!user)
         return res.status(400).send(false);
