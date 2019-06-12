@@ -137,13 +137,13 @@ router.post("/addUser", function(req, res){
 
 		// find user
 		await userInformation.findOne(
-			{$or: [{ "username": username }, { "email": email }]}, function (err, user) {
+			{$or: [{ "username": username }, { "email": email }]}, async (err, user) => {
 
 				// is a new user
 				if (!user) {
 			
 					// determine if the company exists
-					await companyInformation.findOne({ "name": company } , (error, company) => {
+					await companyInformation.findOne({ "name": company }, async (error, company) => {
 						if (err) throw error;
 
 						// if company doesn't exist
@@ -156,9 +156,9 @@ router.post("/addUser", function(req, res){
 							// new company should be created
 							let name = company;
 							let anotherObject = { name };
-							companyInformation.insertOne(anotherObject, (error, result) => {
+							companyInformation.insertOne(anotherObject, async (error, result) => {
 								if (err) throw (err);
-								userInformation.insertOne(userObject, function(err, result){
+								await userInformation.insertOne(userObject, (err, result) => {
 									if (err) throw err;
 
 									// set up the time table
@@ -181,7 +181,7 @@ router.post("/addUser", function(req, res){
 						} else {
 
 							// only create the user (as non admin)
-							userInformation.insertOne(userObject, function(err, result){
+							await userInformation.insertOne(userObject, (err, result) => {
 								if (err) throw err;
 
 								// still set up the time table
