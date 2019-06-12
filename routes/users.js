@@ -59,12 +59,12 @@ router.get("/getCompanyUsers", function (req, res){
 
 // get user by id
 router.get("/getUser", function(req, res){
-  const o_id = new mongoClient.ObjectID(req.query.userId);
+  const userId = req.query.userId;
   
   mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
     if (err) throw err;
     const collection = client.db("usersDb").collection("userInformation");
-    collection.find({ "_id": o_id }, (error, user) => {
+    collection.findOne({ "_id": new ObjectId(userId) }, (error, user) => {
       if (error) throw err;
       if (!user)
         return res.status(400).send(false);
