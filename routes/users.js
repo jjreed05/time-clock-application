@@ -47,7 +47,7 @@ router.get("/getCompanyUsers", (req, res) => {
 		if (err) throw err;
 
 		const collection = client.db("usersDb").collection("userInformation");
-		const cursor = collection.find({ "company": company };
+		const cursor = collection.find({ "company": company });
 
 		let users = [];
 		while (cursor.hasNext()) {
@@ -86,7 +86,7 @@ router.post("/updateUser", function(req, res){
 	 const isAdmin = req.body.isAdmin;
 	 let userObject = { username, password, newEmail, company, isAdmin };
 
-	 mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
+	 mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
 			if (err) throw err;
 
 			const collection = client.db("usersDb").collection("userInformation");
@@ -99,17 +99,15 @@ router.post("/updateUser", function(req, res){
 	 });
 })
 
-//delete user by id
+//delete user by email
 router.delete("/deleteUser", function(req, res){
-	 const userId = req.body.userId.toString();
-	 res.send(userId);
+	 const email = req.body.email;
 
-
-	 mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
+	 mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
 			if (err) throw err;
 
 			const collection = client.db("usersDb").collection("userInformation");
-			collection.deleteOne({"_id": ObjectId(userId)}, (error, result) => {
+			collection.deleteOne({ "email": email }, (error, result) => {
 				 if (error) throw error;
 				 if (!result)
 						return res.status(400).send(false);
