@@ -11,7 +11,7 @@ const saltRounds = 10;
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.get('/hello/', function(req, res, next){
-	 res.send('CRUD testing 4');
+	 res.send('Hey, looking good');
 })
 
 router.post("/authenticate/", function(req, res, next){
@@ -101,7 +101,7 @@ router.post("/updateUser", function(req, res){
 				 res.send(result);
 			})
 	 });
-})
+});
 
 //delete user by email
 router.delete("/deleteUser", function(req, res){
