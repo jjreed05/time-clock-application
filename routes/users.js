@@ -43,15 +43,19 @@ router.post("/authenticate/", function(req, res, next){
 router.get("/getCompanyUsers", (req, res) => {
 	 const company = req.query.company;
 
-	 mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
+	 mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
 		if (err) throw err;
 
 		const collection = client.db("usersDb").collection("userInformation");
-		const cursor = collection.find({ "company": company });
+		const cursor = await collection.find({ "company": company });
 
 		let users = [];
-		while (cursor.hasNext()) {
-		   users.push(myCursor.next());
+		if (cursor){
+			while (await cursor.hasNext()) {
+			   let nextUser = await cursor.next();
+			   console.log(nextUser);
+			   users.push(nextUser);
+			}
 		}
 		res.send(users);
 		client.close();
