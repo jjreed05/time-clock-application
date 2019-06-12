@@ -44,16 +44,16 @@ router.get("/getCompanyUsers", function (req, res){
 	 const company = req.query.company;
 
 	 mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
-			if (err) throw err;
+		if (err) throw err;
 
-			const collection = client.db("usersDb").collection("userInformation");
-			collection.find({ "company": company }, (error, users) => {
-				 if (error) throw err;
-				 if (!users)
-						return res.status(400).send("No users in this company");
-				 res.send(users);
-			});
-			client.close();
+		const collection = client.db("usersDb").collection("userInformation");
+		collection.find({ "company": company }, (error, users) => {
+			 if (error) throw error;
+			 if (!users)
+				return res.status(400).send("No users in this company");
+			 res.send(users);
+		});
+		client.close();
 	 });
 })
 
@@ -66,7 +66,7 @@ router.get("/getUser", function(req, res){
 
 		const collection = client.db("usersDb").collection("userInformation");
 		collection.findOne({ "email": email }, (error, user) => {
-			if (error) throw err;
+			if (error) throw error;
 			if (!user)
 				return res.status(400).send("No user found");
 			res.send(user);
