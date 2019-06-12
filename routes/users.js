@@ -40,10 +40,10 @@ router.post("/authenticate/", function(req, res, next){
 });
 
 // get all users in company
-router.get("/getCompanyUsers", async (req, res) => {
+router.get("/getCompanyUsers", (req, res) => {
 	 const company = req.query.company;
 
-	 mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
+	 mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
 		if (err) throw err;
 
 		const collection = client.db("usersDb").collection("userInformation");
