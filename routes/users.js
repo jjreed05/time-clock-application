@@ -42,7 +42,9 @@ router.post("/authenticate/", function(req, res, next){
 // get all users in company
 router.get("/getCompanyUsers", function (req, res){
 	 const company = req.query.company;
+	 res.send(company);
 
+	 /*
 	 mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
 			if (err) throw err;
 
@@ -50,11 +52,12 @@ router.get("/getCompanyUsers", function (req, res){
 			collection.find({ "company": company }, (error, users) => {
 				 if (error) throw err;
 				 if (!users)
-						return res.status(400).send("No company found");
+						return res.status(400).send("No users in this company");
 				 res.send(users);
 			});
 			client.close();
 	 });
+	 */
 })
 
 // get user by id
@@ -63,6 +66,7 @@ router.get("/getUser", function(req, res){
 	
 	mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
 		if (err) throw err;
+
 		const collection = client.db("usersDb").collection("userInformation");
 		collection.findOne({ "email": email }, (error, user) => {
 			if (error) throw err;
@@ -162,7 +166,7 @@ router.post("/addUser", function(req, res){
 									if (err) throw err;
 
 									// set up the time table
-									const userInformation = result.ops;
+									const userInfo = result.ops;
 									const userId = result.insertedId;
 									const isWorking = false;
 									const time = [];
@@ -171,7 +175,7 @@ router.post("/addUser", function(req, res){
 									// insert time table
 									timeTable.insertOne(timeObj, function(err, result){
 										if(err) throw err;
-										res.send(userInformation);
+										res.send(userInfo);
 										client.close();
 									});
 								});
@@ -185,7 +189,7 @@ router.post("/addUser", function(req, res){
 								if (err) throw err;
 
 								// still set up the time table
-								const userInformation = result.ops;
+								const userInfo = result.ops;
 								const userId = result.insertedId;
 								const isWorking = false;
 								const time = [];
@@ -194,7 +198,7 @@ router.post("/addUser", function(req, res){
 								// still insert time table
 								timeTable.insertOne(timeObj, function(err, result){
 									if(err) throw err;
-									res.send(userInformation);
+									res.send(userInfo);
 									client.close();
 								});
 							});
