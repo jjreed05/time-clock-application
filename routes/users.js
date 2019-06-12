@@ -30,9 +30,9 @@ router.post("/authenticate/", function(req, res, next){
       }, (error, user) => {
          if (error) throw err;
          if (!user)
-            return res.status(400).send(false);
+            return res.status(400).send("No user found");
          if (!bcrypt.compareSync(password, user.password))
-            return res.status(400).send(false);
+            return res.status(400).send("Bad username/email combination");
          res.send(user);
      });
      client.close();
@@ -50,7 +50,7 @@ router.get("/getCompanyUsers", function (req, res){
       collection.find({ "company": company }, (error, users) => {
          if (error) throw err;
          if (!users)
-            return res.status(400).send(false);
+            return res.status(400).send("No company found");
          res.send(users);
       });
       client.close();
@@ -67,35 +67,33 @@ router.get("/getUser", function(req, res){
     collection.findOne({ "email": email }, (error, user) => {
       if (error) throw err;
       if (!user)
-        return res.status(400).send(false);
+        return res.status(400).send("No user found");
       res.send(user);
     })
     client.close();
   });
 });
 
-//update user by id
+//update user by email
 router.post("/updateUser", function(req, res){
-   const userId = req.body.userId.toString();
-   const username = req.body.username;
    const email = req.body.email;
+   const username = req.body.username;
+   const newEmail = req.body.email;
    const company = req.body.company;
    const password = bcrypt.hashSync(req.body.password, saltRounds);
    const isAdmin = req.body.isAdmin;
-   let userObject = { username, password, email, company, isAdmin };
-   res.send(userObject);
+   let userObject = { username, password, newEmail, company, isAdmin };
 
    mongoClient.connect(uri, { useNewUrlParser: true },function(err, client){
       if (err) throw err;
 
       const collection = client.db("usersDb").collection("userInformation");
-      collection.update({"_id": ObjectId(userId)}, userObject, (error, result) => {
+      collection.update({"email": email}, userObject, (error, result) => {
          if (error) throw err;
          if (!result)
-            return res.status(400).send(false);
+            return res.status(400).send("No user found");
          res.send(result);
       })
-
    });
 })
 
