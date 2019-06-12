@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.post("/addPunchIn", function(req, res){
-    const id = req.body._id;
+    const id = ObjectId(req.body._id);
     const date = req.body.date;
     const location = req.body.location;
     const time = req.body.time;
