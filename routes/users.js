@@ -34,17 +34,15 @@ router.post("/authenticate/", function(req, res, next){
 				 if (!bcrypt.compareSync(password, user.password))
 						return res.status(400).send("Bad username/email combination");
 				 res.send(user);
-		 });
-		 client.close();
+			});
+			client.close();
 	 });
 });
 
 // get all users in company
 router.get("/getCompanyUsers", function (req, res){
 	 const company = req.query.company;
-	 res.send(company);
 
-	 /*
 	 mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
 			if (err) throw err;
 
@@ -57,7 +55,6 @@ router.get("/getCompanyUsers", function (req, res){
 			});
 			client.close();
 	 });
-	 */
 })
 
 // get user by id
