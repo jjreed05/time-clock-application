@@ -11,7 +11,7 @@ const saltRounds = 10;
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.get('/hello/', function(req, res, next){
-   res.send('CRUD testing 3');
+   res.send('CRUD testing 4');
 })
 
 router.post("/authenticate/", function(req, res, next){
@@ -59,7 +59,7 @@ router.get("/getCompanyUsers", function (req, res){
 
 // get user by id
 router.get("/getUser", function(req, res){
-  const userId = req.query.userId;
+  const userId = req.query.userId.toString();
   
   mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
     if (err) throw err;
