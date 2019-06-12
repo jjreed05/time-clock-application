@@ -133,60 +133,78 @@ router.post("/addUser", function(req, res){
    mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
       if (err) throw err;
 
-      // determine if company already exists
-      let companyExists;
-      const companyInformation = client.db("usersDb").collection("companyInformation");
-      await companyInformation.findOne({ "name": company} , (error, company) => {
-        if (err) throw Error("start of connect");
-        companyExists = !!company;
-      });
-      res.send(companyExists);
-
-      // no error above this line
-
-      // some things need to happen if the company is new
-      if (!companyExists){
-
-         // first the new user should be admin
-         isAdmin = true;
-         userObject = { username, password, email, company, isAdmin };
-
-         // and add the new company to the company collection
-         let name = company;
-         let anotherObject = { name };
-         companyInformation.insertOne(anotherObject, (error, result) => {
-            if (err) throw (err);
-         })
-      }
-
       // add user to the db
       const userInformation = client.db("usersDb").collection("userInformation");
+      const companyInformation = client.db("usersDb").collection("companyInformation");
       const timeTable = client.db("usersDb").collection("timeTable");
       await userInformation.findOne(
-          {$or: [{ "username": username }, { "email": email }]}, function (err, user) {
-              if (!user) {
+        {$or: [{ "username": username }, { "email": email }]}, function (err, user) {
+
+          // is a new user
+          if (!user) {
+        
+            // determine if the company exists
+            await companyInformation.findOne({ "name": company } , (error, company) => {
+              if (err) throw error;
+
+              // if company doesn't exist
+              if(!!company){
+
+                // new user should be created as admin
+                isAdmin = true;
+                userObject = { username, password, email, company, isAdmin };
+
+                // new company should be created
+                let name = company;
+                let anotherObject = { name };
+                companyInformation.insertOne(anotherObject, (error, result) => {
+                  if (err) throw (err);
                   userInformation.insertOne(userObject, function(err, result){
-                      if (err) throw err;
+                    if (err) throw err;
 
-                      // set up the time table
-                      const userInformation = result.ops;
-                      const userId = result.insertedId;
-                      const isWorking = false;
-                      const time = [];
-                      const timeObj = { userId, isWorking, time };
+                    // set up the time table
+                    const userInformation = result.ops;
+                    const userId = result.insertedId;
+                    const isWorking = false;
+                    const time = [];
+                    const timeObj = { userId, isWorking, time };
 
-                      // insert time table
-                      timeTable.insertOne(timeObj, function(err, result){
-                          if(err) throw err;
-                          res.send(userInformation);
-                          client.close();
-                      });
+                    // insert time table
+                    timeTable.insertOne(timeObj, function(err, result){
+                      if(err) throw err;
+                      res.send(userInformation);
+                      client.close();
+                    });
                   });
+                });
+              } else {
+                companyInformation.insertOne(anotherObject, (error, result) => {
+                  if (err) throw (err);
+                  userInformation.insertOne(userObject, function(err, result){
+                    if (err) throw err;
+
+                    // set up the time table
+                    const userInformation = result.ops;
+                    const userId = result.insertedId;
+                    const isWorking = false;
+                    const time = [];
+                    const timeObj = { userId, isWorking, time };
+
+                    // insert time table
+                    timeTable.insertOne(timeObj, function(err, result){
+                      if(err) throw err;
+                      res.send(userInformation);
+                      client.close();
+                    });
+                  });
+                });
               }
-              else {
-                  res.status(400).send("User exists");
-                  client.close();
-              }
+            });
+          }
+          else {
+            res.status(400).send("User exists");
+            client.close();
+          }
        });
     });
 });
