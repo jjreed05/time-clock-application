@@ -33,7 +33,12 @@ router.post("/authenticate/", function(req, res, next){
 						return res.status(400).send("No user found");
 				 if (!bcrypt.compareSync(password, user.password))
 						return res.status(400).send("Bad username/email combination");
-				 res.send(user);
+				 res.send({
+				 	"company": user.company,
+				 	"email": user.email,
+				 	"username": user.username,
+				 	"isAdmin": user.isAdmin
+				 });
 			});
 			client.close();
 	 });
