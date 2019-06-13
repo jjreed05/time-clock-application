@@ -67,7 +67,7 @@ router.post("/addPunchOut", function(req, res){
                 collection.updateOne({username: user}, {$set: {isWorking: false, time: timeArray}},
                     function(err, result){
                         if (err) throw err;
-                        res.send(result);
+                        res.send(true);
                         client.close();
                     });
             }
