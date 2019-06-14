@@ -167,14 +167,11 @@ router.post("/addUser", function(req, res){
 					await companyInformation.findOne({ "name": company }, async (error, companyObj) => {
 						if (err) throw error;
 
-                  console.log(companyObj); 
-
 						// if company doesn't exist
 						if(companyObj == null){
 
 							// new user should be created as admin
-							isAdmin = true;
-							userObject = { username, password, email, company, isAdmin };
+							userObject["isAdmin"] = true;
 
 							// new company should be created
 							let name = company;
