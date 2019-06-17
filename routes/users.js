@@ -33,7 +33,12 @@ router.post("/authenticate/", function(req, res, next){
 						return res.status(400).send("No user found");
 				 if (!bcrypt.compareSync(password, user.password))
 						return res.status(400).send("Bad username/email combination");
-				 res.send(user);
+				 res.send({
+				 	"company": user.company,
+				 	"email": user.email,
+				 	"username": user.username,
+				 	"isAdmin": user.isAdmin
+				 });
 			});
 			client.close();
 	 });
@@ -121,10 +126,11 @@ router.delete("/deleteUser", function(req, res){
 })
 
 router.post("/addUser", function(req, res){
-	 const username = req.body.username;
-	 const email = req.body.email;
-	 const company = req.body.company;
-	 const password = bcrypt.hashSync(req.body.password, saltRounds);
+	 let username = req.body.username;
+	 let email = req.body.email;
+	 let company = req.body.company;
+    let secret = req.body.secret; 
+	 let password = bcrypt.hashSync(req.body.password, saltRounds);
 
 	 let isAdmin = false;
 	 let userObject = { username, password, email, company, isAdmin };
@@ -139,27 +145,38 @@ router.post("/addUser", function(req, res){
 		const companyInformation = client.db("usersDb").collection("companyInformation");
 		const timeTable = client.db("usersDb").collection("timeTable");
 
-		// find user
-		await userInformation.findOne(
-			{$or: [{ "username": username }, { "email": email }]}, async (err, user) => {
+		// find user of company by username or email
+		await userInformation.findOne({
+         $and: [
+            {
+               $or: [
+                  { "username": username }, 
+                  { "email": email }
+               ]
+            }, 
+            {
+               "company": company
+            }
+         ]}, 
+         async (err, user) => {
 
-				// is a new user
+				// is a new user in company
 				if (!user) {
 			
 					// determine if the company exists
-					await companyInformation.findOne({ "name": company }, async (error, company) => {
+					await companyInformation.findOne({ "name": company }, async (error, companyObj) => {
 						if (err) throw error;
 
 						// if company doesn't exist
-						if(!!company){
+						if(companyObj == null){
 
 							// new user should be created as admin
-							isAdmin = true;
-							userObject = { username, password, email, company, isAdmin };
+							userObject["isAdmin"] = true;
 
 							// new company should be created
 							let name = company;
-							let anotherObject = { name };
+                     secret = bcrypt.hashSync(secret, saltRounds);
+							let anotherObject = { name, secret };
 							companyInformation.insertOne(anotherObject, async (error, result) => {
 								if (err) throw (err);
 								await userInformation.insertOne(userObject, (err, result) => {
@@ -181,27 +198,31 @@ router.post("/addUser", function(req, res){
 								});
 							});
 
-						// of company already exists
+						// if company already exists
 						} else {
 
-							// only create the user (as non admin)
-							await userInformation.insertOne(userObject, (err, result) => {
-								if (err) throw err;
+                     if (!bcrypt.compareSync(secret, companyObj.secret))
+                        return res.status(400).send("Incorrect company secret combination");
 
-								// still set up the time table
-								const userInfo = result.ops;
-								const userId = result.insertedId;
-								const isWorking = false;
-								const time = [];
-								const timeObj = { userId, isWorking, time };
+                     // user secret correct, 
+                     // create the user as non admin
+                     await userInformation.insertOne(userObject, async (err, result) => {
+                        if (err) throw err;
 
-								// still insert time table
-								timeTable.insertOne(timeObj, function(err, result){
-									if(err) throw err;
-									res.send(userInfo);
-									client.close();
-								});
-							});
+                        // still set up the time table
+                        const userInfo = result.ops;
+                        const userId = result.insertedId;
+                        const isWorking = false;
+                        const time = [];
+                        const timeObj = { userId, isWorking, time };
+
+                        // still insert time table
+                        timeTable.insertOne(timeObj, function(err, result){
+                           if(err) throw err;
+                           res.send(userInfo);
+                           client.close();
+                        });
+                     });
 						}
 					});
 				} else {
