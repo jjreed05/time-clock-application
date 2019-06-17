@@ -40,7 +40,7 @@ router.post("/addPunchIn", function(req, res){
 });
 
 router.post("/addPunchOut", function(req, res){
-    const user = req.body.username;
+    const email = req.body.email;
     const date = req.body.date;
     const location = req.body.location;
     const time = req.body.time;
@@ -51,7 +51,7 @@ router.post("/addPunchOut", function(req, res){
 
         const collection = client.db("usersDb").collection("timeTable");
 
-        collection.findOne({username: user}, function(err, result){
+        collection.findOne({email: email}, function(err, result){
             if (err) throw err;
 
             const punchNums = result.punchNums;
@@ -64,7 +64,7 @@ router.post("/addPunchOut", function(req, res){
 
             // lets just make sure that they are working just in case
             if (isWorking) {
-                collection.updateOne({username: user}, {$set: {isWorking: false, time: timeArray}},
+                collection.updateOne({email: email}, {$set: {isWorking: false, time: timeArray}},
                     function(err, result){
                         if (err) throw err;
                         res.send(true);
@@ -80,7 +80,7 @@ router.post("/addPunchOut", function(req, res){
 });
 
 router.get("/isWorking", function (req, res){
-    const username = req.body.username;
+    const email = req.body.email;
 
     // connect to the database
     mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client) {
@@ -88,7 +88,7 @@ router.get("/isWorking", function (req, res){
 
         const collection = client.db("usersDb").collection("timeTable");
 
-        collection.findOne({username: username}, function(err, result){
+        collection.findOne({email: email}, function(err, result){
             if (err) throw err;
 
             res.send(result.isWorking);
@@ -96,4 +96,5 @@ router.get("/isWorking", function (req, res){
         });
     });
 });
+
 module.exports = router;
