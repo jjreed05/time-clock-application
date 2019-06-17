@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.post("/addPunchIn", function(req, res){
-    const user = req.body.username;
+    const user = req.body.email;
     const date = req.body.date;
     const location = req.body.location;
     const time = req.body.time;
@@ -22,14 +22,14 @@ router.post("/addPunchIn", function(req, res){
         const collection = client.db("usersDb").collection("timeTable");
 
         //get punchNums first
-        collection.findOne({ username: user }, function(err, result){
+        collection.findOne({ email: user }, function(err, result){
             if (err) throw err;
 
             // this variable will allow us to keep track of the array
             const punchNums = result.punchNums + 1;
 
             // update the time table
-            collection.updateOne({ username: user }, {$set: {isWorking: true, punchNums: punchNums}, $push: {time: timeObj}},
+            collection.updateOne({ email: user }, {$set: {isWorking: true, punchNums: punchNums}, $push: {time: timeObj}},
                 function(err, result){
                     if (err) throw err;
                     res.send(true);
