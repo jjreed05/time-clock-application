@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.post("/addPunchIn", function(req, res){
-    const user = req.body.email;
+    const email = req.body.email;
     const date = req.body.date;
     const location = req.body.location;
     const timeObj = { timestampIn: timestamp, locationIn: location };
@@ -21,7 +21,7 @@ router.post("/addPunchIn", function(req, res){
         const collection = client.db("usersDb").collection("timeTable");
 
         //get punchNums first
-        collection.findOne({ email: user }, function(err, result){
+        collection.findOne({ email: email }, function(err, result){
             if (err) throw err;
 
             // this variable will allow us to keep track of the array
@@ -77,7 +77,8 @@ router.post("/addPunchOut", function(req, res){
 });
 
 router.get('/getLastPunch', function (req, res){
-    const email = req.body.email;
+    const email = req.query.email;
+    console.log(email);
 
     mongoClient.connect(uri, { userNewUrlParser: true}, function(err, client){
         if (err) throw err;
@@ -91,15 +92,20 @@ router.get('/getLastPunch', function (req, res){
             const isWorking = result.isWorking;
             const time = result.time;
             const lastPunch = time.pop();
+            console.log(lastPunch);
             let lastPunchTimestamp = null;
+            let location = null;
             if (isWorking){
                 lastPunchTimestamp = lastPunch.timestampIn;
+                location = lastPunch.locationIn;
             } else {
                 lastPunchTimestamp = lastPunch.timestampOut;
+                location = lastPunch.locationOut;
             }
             res.send({
                 'punchedIn': isWorking,
-                'lastPunch': lastPunchTimestamp
+                'lastPunch': lastPunchTimestamp,
+                'location': location
             })
         });
     });
