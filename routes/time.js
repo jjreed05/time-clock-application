@@ -10,10 +10,9 @@ const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryW
 
 router.post("/addPunchIn", function(req, res){
     const user = req.body.username;
-    const date = req.body.date;
+    const timestamp = req.body.timestamp;
     const location = req.body.location;
-    const time = req.body.time;
-    const timeObj = { dateIn: date, locationIn: location, timeIn: time };
+    const timeObj = { timestampIn: timestamp, locationIn: location };
 
     // connect to the database
     mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
@@ -41,9 +40,8 @@ router.post("/addPunchIn", function(req, res){
 
 router.post("/addPunchOut", function(req, res){
     const user = req.body.username;
-    const date = req.body.date;
+    const timestamp = req.body.timestamp;
     const location = req.body.location;
-    const time = req.body.time;
 
     // connect to the database
     mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client) {
@@ -58,9 +56,8 @@ router.post("/addPunchOut", function(req, res){
             const isWorking = result.isWorking;
             let timeArray = result.time;
 
-            timeArray[punchNums].dateOut = date;
             timeArray[punchNums].locationOut = location;
-            timeArray[punchNums].timeOut = time;
+            timeArray[punchNums].timestampOut = timestamp;
 
             // lets just make sure that they are working just in case
             if (isWorking) {
@@ -77,6 +74,33 @@ router.post("/addPunchOut", function(req, res){
             }
         });
     });
+});
+
+router.get('/getLastPunch', function (req, res){
+    const email = req.body.email;
+
+    mongoClient.connect(uri, { userNewUrlParser: true}, function(err, client){
+        if (err) throw err;
+
+        const collection = client.db("usersDb").collection("timeTable");
+        collection.findOne({ email: email }, function(err, result){
+            if (err) throw err;
+            const isWorking = result.isWorking;
+            const time = result.time;
+            const lastPunch = time.pop();
+            let lastPunchTimestamp = null;
+            if (isWorking){
+                lastPunchTimestamp = lastPunch.timestampIn;
+            } else {
+                lastPunchTimestamp = lastPunch.timestampOut;
+            }
+            res.send({
+                'punchedIn': isWorking,
+                'lastPunch': lastPunchTimestamp
+            })
+        });
+    });
+    // return 
 });
 
 router.get("/isWorking", function (req, res){
@@ -96,4 +120,5 @@ router.get("/isWorking", function (req, res){
         });
     });
 });
+
 module.exports = router;
