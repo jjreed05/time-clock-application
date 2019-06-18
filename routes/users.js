@@ -211,10 +211,10 @@ router.post("/addUser", function(req, res){
 
                         // still set up the time table
                         const userInfo = result.ops;
-                        const userId = result.insertedId;
                         const isWorking = false;
+                        const punchNums = -1;
                         const time = [];
-                        const timeObj = { userId, isWorking, time };
+                        const timeObj = { email, punchNums, isWorking, time };
 
                         // still insert time table
                         timeTable.insertOne(timeObj, function(err, result){

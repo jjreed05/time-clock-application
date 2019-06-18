@@ -9,8 +9,8 @@ const mongoose = require("mongoose");
 const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
 
 router.post("/addPunchIn", function(req, res){
-    const user = req.body.username;
-    const timestamp = req.body.timestamp;
+    const user = req.body.email;
+    const date = req.body.date;
     const location = req.body.location;
     const timeObj = { timestampIn: timestamp, locationIn: location };
 
@@ -21,14 +21,14 @@ router.post("/addPunchIn", function(req, res){
         const collection = client.db("usersDb").collection("timeTable");
 
         //get punchNums first
-        collection.findOne({ username: user }, function(err, result){
+        collection.findOne({ email: user }, function(err, result){
             if (err) throw err;
 
             // this variable will allow us to keep track of the array
             const punchNums = result.punchNums + 1;
 
             // update the time table
-            collection.updateOne({ username: user }, {$set: {isWorking: true, punchNums: punchNums}, $push: {time: timeObj}},
+            collection.updateOne({ email: user }, {$set: {isWorking: true, punchNums: punchNums}, $push: {time: timeObj}},
                 function(err, result){
                     if (err) throw err;
                     res.send(true);
@@ -39,8 +39,8 @@ router.post("/addPunchIn", function(req, res){
 });
 
 router.post("/addPunchOut", function(req, res){
-    const user = req.body.username;
-    const timestamp = req.body.timestamp;
+    const email = req.body.email;
+    const date = req.body.date;
     const location = req.body.location;
 
     // connect to the database
@@ -49,7 +49,7 @@ router.post("/addPunchOut", function(req, res){
 
         const collection = client.db("usersDb").collection("timeTable");
 
-        collection.findOne({username: user}, function(err, result){
+        collection.findOne({email: email}, function(err, result){
             if (err) throw err;
 
             const punchNums = result.punchNums;
@@ -61,7 +61,7 @@ router.post("/addPunchOut", function(req, res){
 
             // lets just make sure that they are working just in case
             if (isWorking) {
-                collection.updateOne({username: user}, {$set: {isWorking: false, time: timeArray}},
+                collection.updateOne({email: email}, {$set: {isWorking: false, time: timeArray}},
                     function(err, result){
                         if (err) throw err;
                         res.send(true);
@@ -104,7 +104,7 @@ router.get('/getLastPunch', function (req, res){
 });
 
 router.get("/isWorking", function (req, res){
-    const username = req.body.username;
+    const email = req.body.email;
 
     // connect to the database
     mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client) {
@@ -112,7 +112,7 @@ router.get("/isWorking", function (req, res){
 
         const collection = client.db("usersDb").collection("timeTable");
 
-        collection.findOne({username: username}, function(err, result){
+        collection.findOne({email: email}, function(err, result){
             if (err) throw err;
 
             res.send(result.isWorking);
