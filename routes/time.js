@@ -85,6 +85,9 @@ router.get('/getLastPunch', function (req, res){
         const collection = client.db("usersDb").collection("timeTable");
         collection.findOne({ email: email }, function(err, result){
             if (err) throw err;
+
+            if (!result)
+                res.status(400).send("User Not Found");
             const isWorking = result.isWorking;
             const time = result.time;
             const lastPunch = time.pop();
