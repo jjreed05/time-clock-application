@@ -10,7 +10,7 @@ const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryW
 
 router.post("/addPunchIn", function(req, res){
     const email = req.body.email;
-    const date = req.body.date;
+    const timestamp = req.body.timestamp;
     const location = req.body.location;
     const timeObj = { timestampIn: timestamp, locationIn: location };
 
@@ -28,10 +28,14 @@ router.post("/addPunchIn", function(req, res){
             const punchNums = result.punchNums + 1;
 
             // update the time table
-            collection.updateOne({ email: user }, {$set: {isWorking: true, punchNums: punchNums}, $push: {time: timeObj}},
+            collection.updateOne({ email: email }, {$set: {isWorking: true, punchNums: punchNums}, $push: {time: timeObj}},
                 function(err, result){
                     if (err) throw err;
-                    res.send(true);
+                    res.send({
+                        'punchedIn': true,
+                        'lastPunch': timestamp,
+                        'location': location
+                    })
                     client.close();
                 });
         });
@@ -40,7 +44,7 @@ router.post("/addPunchIn", function(req, res){
 
 router.post("/addPunchOut", function(req, res){
     const email = req.body.email;
-    const date = req.body.date;
+    const timestamp = req.body.timestamp;
     const location = req.body.location;
 
     // connect to the database
@@ -64,7 +68,11 @@ router.post("/addPunchOut", function(req, res){
                 collection.updateOne({email: email}, {$set: {isWorking: false, time: timeArray}},
                     function(err, result){
                         if (err) throw err;
-                        res.send(true);
+                        res.send({
+                            'punchedIn': false,
+                            'lastPunch': timestamp,
+                            'location': location
+                        })
                         client.close();
                     });
             }
