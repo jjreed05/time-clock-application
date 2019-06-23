@@ -85,7 +85,7 @@ router.post("/addPunchOut", function(req, res){
 });
 
 router.get('/getLastPunch', function (req, res){
-    const email = req.query.email;
+    const email = req.body.email;
     console.log(email);
 
     mongoClient.connect(uri, { userNewUrlParser: true}, function(err, client){
