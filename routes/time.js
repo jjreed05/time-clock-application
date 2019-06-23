@@ -23,21 +23,29 @@ router.post("/addPunchIn", function(req, res){
         //get punchNums first
         collection.findOne({ email: email }, function(err, result){
             if (err) throw err;
+            console.log("Found user, punching in");
 
             // this variable will allow us to keep track of the array
             const punchNums = result.punchNums + 1;
+            const isWorking = result.isWorking;
+            
 
-            // update the time table
-            collection.updateOne({ email: email }, {$set: {isWorking: true, punchNums: punchNums}, $push: {time: timeObj}},
-                function(err, result){
-                    if (err) throw err;
-                    res.send({
-                        'punchedIn': true,
-                        'lastPunch': timestamp,
-                        'location': location
-                    })
-                    client.close();
-                });
+            // make sure they are punched out before punching in
+            if (!isWorking){
+                collection.updateOne({ email: email }, {$set: {isWorking: true, punchNums: punchNums}, $push: {time: timeObj}},
+                    function(err, result){
+                        if (err) throw err;
+                        res.send({
+                            'punchedIn': true,
+                            'lastPunch': timestamp,
+                            'location': location
+                        })
+                        client.close();
+                    });
+            } else {
+                res.status(400).send("User already punched in");
+                client.close();
+            }
         });
     });
 });
@@ -55,10 +63,13 @@ router.post("/addPunchOut", function(req, res){
 
         collection.findOne({email: email}, function(err, result){
             if (err) throw err;
+            console.log("Found user, punching out");
 
             const punchNums = result.punchNums;
             const isWorking = result.isWorking;
             let timeArray = result.time;
+
+            
 
             timeArray[punchNums].locationOut = location;
             timeArray[punchNums].timestampOut = timestamp;
@@ -75,9 +86,8 @@ router.post("/addPunchOut", function(req, res){
                         })
                         client.close();
                     });
-            }
-            else{
-                res.status(400).send("Isn't punched in");
+            } else {
+                res.status(400).send("User isn't punched in");
                 client.close();
             }
         });
@@ -85,10 +95,10 @@ router.post("/addPunchOut", function(req, res){
 });
 
 router.get('/getLastPunch', function (req, res){
-    const email = req.body.email;
+    const email = req.query.email;
     console.log(email);
 
-    mongoClient.connect(uri, { userNewUrlParser: true}, function(err, client){
+    mongoClient.connect(uri, { useNewUrlParser: true}, function(err, client){
         if (err) throw err;
 
         const collection = client.db("usersDb").collection("timeTable");
@@ -96,9 +106,14 @@ router.get('/getLastPunch', function (req, res){
             if (err) throw err;
 
             if (!result)
-                res.status(400).send("User Not Found");
+                return res.status(400).send("User not found");
             const isWorking = result.isWorking;
+            console.log('isWorking: ' + isWorking);
             const time = result.time;
+            console.log('time');
+            console.log(time);
+            if (time.length == 0)
+                return res.status(400).send("No punches found");
             const lastPunch = time.pop();
             console.log(lastPunch);
             let lastPunchTimestamp = null;

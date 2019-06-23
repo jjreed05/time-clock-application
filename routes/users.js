@@ -87,12 +87,20 @@ router.get("/getUser", function(req, res){
 
 //update user by email
 router.post("/updateUser", function(req, res){
+	 
+	 // to identify user
 	 const email = req.body.email;
-	 const username = req.body.username;
-	 const newEmail = req.body.email;
-	 const company = req.body.company;
-	 const password = bcrypt.hashSync(req.body.password, saltRounds);
+
+	 // passed params to update
+	 const newUsername = req.body.newUsername;
+	 const newEmail = req.body.newEmail;
+	 const newPassword = bcrypt.hashSync(req.body.newPassword, saltRounds);
+
+	 // redundant information sent from client
+ 	 const company = req.body.company;
 	 const isAdmin = req.body.isAdmin;
+
+	 // new object
 	 let userObject = { username, password, newEmail, company, isAdmin };
 
 	 mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
