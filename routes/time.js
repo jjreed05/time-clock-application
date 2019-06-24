@@ -64,15 +64,13 @@ router.post("/addPunchOut", function(req, res){
         collection.findOne({email: email}, function(err, result){
             if (err) throw err;
             console.log("Found user, punching out");
+            console.log("result: ");
+            console.log(result);
 
             const punchNums = result.punchNums;
             const isWorking = result.isWorking;
-            let timeArray = result.time;
-
-            
-
-            timeArray[punchNums].locationOut = location;
-            timeArray[punchNums].timestampOut = timestamp;
+            result.time[result.time.length - 1].locationOut = location;
+            result.time[result.time.length - 1].timestampOut = timestamp;
 
             // lets just make sure that they are working just in case
             if (isWorking) {
