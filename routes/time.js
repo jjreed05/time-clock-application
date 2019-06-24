@@ -133,6 +133,25 @@ router.get('/getLastPunch', function (req, res){
     // return 
 });
 
+router.get('/getPunches', function (req, res){
+   const email = req.query.email;
+
+   mongoClient.connect(uri, { useNewUrlParser: true }, function (err, client){
+      if (err) throw err;
+
+      const collection = client.db("usersDb").collection("timeTable");
+      collection.findOne({ email: email}, function(err, result){
+         if (err) throw err;
+
+         if (!result)
+            return res.status(400).send("User not found");
+         res.send({
+            'punches': result.time
+         })
+      })
+   })
+})
+
 router.get("/isWorking", function (req, res){
     const email = req.body.email;
 
