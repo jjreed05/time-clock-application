@@ -74,7 +74,7 @@ router.post("/addPunchOut", function(req, res){
 
             // lets just make sure that they are working just in case
             if (isWorking) {
-                collection.updateOne({email: email}, {$set: {isWorking: false, time: timeArray}},
+                collection.updateOne({email: email}, {$set: {isWorking: false, time: result.time}},
                     function(err, result){
                         if (err) throw err;
                         res.send({
