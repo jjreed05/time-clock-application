@@ -210,7 +210,7 @@ router.post("/addUser", function(req, res){
 						} else {
 
                      if (!bcrypt.compareSync(secret, companyObj.secret))
-                        return res.status(400).send("Incorrect company secret combination");
+                        return res.status(400).send({ error: "Incorrect company secret combination" });
 
                      // user secret correct, 
                      // create the user as non admin
@@ -234,7 +234,7 @@ router.post("/addUser", function(req, res){
 						}
 					});
 				} else {
-					res.status(400).send("User already exists");
+					res.status(400).send({ error: "User already exists" });
 					client.close();
 				}
 		 }); // end finding user
