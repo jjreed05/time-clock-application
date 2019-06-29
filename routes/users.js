@@ -99,14 +99,20 @@ router.post("/updateUser", function(req, res){
 	 // passed params to update
 	 const username = req.body.username;
 	 const email = req.body.email;
-	 const password = bcrypt.hashSync(req.body.newPassword, saltRounds);
+	 const password = bcrypt.hashSync(req.body.password, saltRounds);
 
-	 // redundant information sent from client
- 	 const company = req.body.company;
-	 const isAdmin = req.body.isAdmin;
+    // client sends redundant information 
+    const company = req.body.company;
+    const isAdmin = req.body.isAdmin;
 
 	 // new object
 	 let userObject = { username, password, email, company, isAdmin };
+
+   /*
+   
+      NEED TO MAKE SURE EMAIL DOESNT ALREADY EXIST
+
+   */
 
 	 mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
 			if (err) throw err;
@@ -136,6 +142,14 @@ router.post("/updateCompany", function(req, res){
    // new company
    let companyObject = { company, secret }
 
+   /*
+   
+      NEED TO MAKE SURE COMPANY NAME DOESNT ALREADY EXIST
+
+      NEED TO UPDATE COMPANY PROP ON ALL USERS WITH OLD COMPANY
+
+   */
+
    mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
       if (err) throw err;
 
@@ -144,6 +158,7 @@ router.post("/updateCompany", function(req, res){
          if (error) throw err;
          if (!result)
             return res.status(400).send({ error: "No company found" });
+         res.send(result);
       })
    })
 
