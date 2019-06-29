@@ -78,7 +78,7 @@ router.get("/getUser", function(req, res){
 		collection.findOne({ "email": email }, (error, user) => {
 			if (error) throw error;
 			if (!user)
-				return res.status(400).send("No user found");
+				return res.status(400).send({ error: "No user found" });
 			res.send(user);
 		})
 		client.close();
@@ -86,35 +86,70 @@ router.get("/getUser", function(req, res){
 });
 
 //update user by email
+/*
+- username
+- email
+- password
+*/
 router.post("/updateUser", function(req, res){
 	 
 	 // to identify user
-	 const email = req.body.email;
+	 const oldEmail = req.body.oldEmail;
 
 	 // passed params to update
-	 const newUsername = req.body.newUsername;
-	 const newEmail = req.body.newEmail;
-	 const newPassword = bcrypt.hashSync(req.body.newPassword, saltRounds);
+	 const username = req.body.username;
+	 const email = req.body.email;
+	 const password = bcrypt.hashSync(req.body.newPassword, saltRounds);
 
 	 // redundant information sent from client
  	 const company = req.body.company;
 	 const isAdmin = req.body.isAdmin;
 
 	 // new object
-	 let userObject = { username, password, newEmail, company, isAdmin };
+	 let userObject = { username, password, email, company, isAdmin };
 
 	 mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
 			if (err) throw err;
 
 			const collection = client.db("usersDb").collection("userInformation");
-			collection.update({"email": email}, userObject, (error, result) => {
+			collection.update({"email": oldEmail}, userObject, (error, result) => {
 				 if (error) throw err;
 				 if (!result)
-						return res.status(400).send("No user found");
+						return res.status(400).send({ error: "No user found" });
 				 res.send(result);
 			})
 	 });
 });
+
+
+// takes user email for validation
+// - company name
+// - company secret 
+router.post("/updateCompany", function(req, res){
+
+   const oldCompany = req.body.oldCompany;
+   const company = req.body.company;
+   const secret = bcrypt.hashSync(req.body.secret, saltRounds);
+
+   const companyInformation = client.db("usersDb").collection("companyInformation");
+
+   // new company
+   let companyObject = { company, secret }
+
+   mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
+      if (err) throw err;
+
+      const companyInformation = client.db("usersDb").collection("companyInformation");
+      companyInformation.update({"company": oldCompany}, companyObject, (error, result) => {
+         if (error) throw err;
+         if (!result)
+            return res.status(400).send({ error: "No company found" });
+      })
+   })
+
+
+   res.send("Unfinished");
+})
 
 //delete user by email
 router.delete("/deleteUser", function(req, res){
