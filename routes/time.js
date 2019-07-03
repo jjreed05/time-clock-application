@@ -43,7 +43,7 @@ router.post("/addPunchIn", function(req, res){
                         client.close();
                     });
             } else {
-                res.status(400).send("User already punched in");
+                res.status(400).send({ error: "User already punched in" });
                 client.close();
             }
         });
@@ -85,7 +85,7 @@ router.post("/addPunchOut", function(req, res){
                         client.close();
                     });
             } else {
-                res.status(400).send("User isn't punched in");
+                res.status(400).send({ error: "User isn't punched in" });
                 client.close();
             }
         });
@@ -104,14 +104,14 @@ router.get('/getLastPunch', function (req, res){
             if (err) throw err;
 
             if (!result)
-                return res.status(400).send("User not found");
+                return res.status(400).send({ error: "User not found" });
             const isWorking = result.isWorking;
             console.log('isWorking: ' + isWorking);
             const time = result.time;
             console.log('time');
             console.log(time);
             if (time.length == 0)
-                return res.status(400).send("No punches found");
+                return res.status(400).send({ error: "No punches found" });
             const lastPunch = time.pop();
             console.log(lastPunch);
             let lastPunchTimestamp = null;
@@ -128,8 +128,8 @@ router.get('/getLastPunch', function (req, res){
                 'lastPunch': lastPunchTimestamp,
                 'location': location
             })
-        });
-    });
+        })
+    })
     // return 
 });
 
@@ -144,7 +144,7 @@ router.get('/getPunches', function (req, res){
          if (err) throw err;
 
          if (!result)
-            return res.status(400).send("User not found");
+            return res.status(400).send({ error: "User not found" });
          res.send({
             'punches': result.time
          })
@@ -160,10 +160,8 @@ router.get("/isWorking", function (req, res){
         if (err) throw err;
 
         const collection = client.db("usersDb").collection("timeTable");
-
         collection.findOne({email: email}, function(err, result){
             if (err) throw err;
-
             res.send(result.isWorking);
             client.close();
         });

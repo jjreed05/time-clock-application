@@ -177,7 +177,7 @@ router.delete("/deleteUser", function(req, res){
 			collection.deleteOne({ "email": email }, (error, result) => {
 				 if (error) throw error;
 				 if (!result)
-						return res.status(400).send(false);
+						return res.status(400).send({ error: "No user found" });
 				 res.send(result);
 			})
 	 });
