@@ -119,13 +119,36 @@ router.post("/updateUser", function(req, res){
 
 			const collection = client.db("usersDb").collection("userInformation");
 			collection.update({"email": oldEmail}, userObject, (error, result) => {
-				 if (error) throw err;
+				 if (error) throw error;
 				 if (!result)
 						return res.status(400).send({ error: "No user found" });
 				 res.send(result);
 			})
 	 });
 });
+
+router.post("/toggleAdmin", function(req, res){
+   const user = req.body.user;
+   let newUserObj = {
+      username: user.username,
+      password: user.password,
+      email: user.email,
+      company: user.company,
+      isAdmin: !user.isAdmin
+   }
+
+   mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
+      if (err) throw err;
+
+      const collection = client.db("usersDb").collection("userInformation");
+      collection.update({"email": user.email }, newUserObject, (error, result) => {
+         if (error) throw error;
+         if (!result)
+            return res.status(400).send({ error: "No user found" });
+         res.send(result);
+      })
+   })
+})
 
 
 // takes user email for validation
