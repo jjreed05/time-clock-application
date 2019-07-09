@@ -27,10 +27,47 @@ router.post('/forgotPassword', function(req, res, next){
 		collection.findOne({ email: email }, (error, user) => {
 			if (user == null){
 				return res.status(400).send({ message: "Email not recognized"});
+			} else {
+				const newPassword = generateRandomPassword();
+				return res.send({ message: "Email Sent (not really, I'm not done)"});
+				/*
+				const transporter = nodemailer.createTransport({
+					service: 'gmail',
+					auth: {
+						user: `${process.env.EMAIL_ADDRESS}`,
+						pass: `${process.env.EMAIL_PASSWORD}`
+					},
+				});
+
+				const mailOptions = {
+					from: `${process.env.EMAIL_ADDRESS}`,
+					to: `${user.email}`,
+					subject: "Link To Reset Password",
+					text: 
+					`You are receiving this because you (or someone else) have requested the reset of the password for you account.\n\n` +
+					`Your password has been temporarily reset to: ${newPassword}\n\n` +
+					`Please reset your password as soon as you are able\n\n`,
+				}
+
+				console.log('sending mail');
+
+				transporter.sendMail(mailOptions, function(err, res){
+					if (err)
+						return res.status(400).send({ message: "Failed to send email"});
+					else 
+						return res.send({ message: "Email Sent"});
+				})
+				*/
 			}
-			return res.send({ message: "Email Sent (not really, I'm not done)"});
+
+			
 		});
 	})
+
 })
+
+const generateRandomPassword = () => {
+	return 'testresetpassword';
+}
 
 module.exports = router;
