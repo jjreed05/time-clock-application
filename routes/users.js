@@ -32,7 +32,7 @@ router.post("/authenticate/", function(req, res, next){
 				 if (!user)
 						return res.status(400).send({ error: "No user found" });
 				 if (!bcrypt.compareSync(password, user.password))
-						return res.status(400).send({ error: "Bad username/email combination" });
+						return res.status(400).send({ error: "Bad Username / Email and Password combination" });
 				 res.send({
 				 	"company": user.company,
 				 	"email": user.email,
