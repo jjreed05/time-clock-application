@@ -29,6 +29,11 @@ router.post('/forgotPassword', function(req, res, next){
 				return res.status(400).send({ error: "Email not recognized"});
 			}
 			return res.send({ message: "Email Sent (not really, I'm not done)"});
+		}).catch((error) => {
+			return res.status(400).send({ error: "Error Caught"});
+			client.close();
 		})
 	})
 })
+
+module.exports = router;
