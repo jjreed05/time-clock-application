@@ -26,7 +26,7 @@ router.post('/forgotPassword', function(req, res, next){
 		const collection = client.db("usersDb").collection("userInformation");
 		collection.findOne({ email: email }, (error, user) => {
 			if (user == null){
-				return res.status(400).send({ error: "Email not recognized"});
+				return res.status(400).send({ message: "Email not recognized"});
 			}
 			return res.send({ message: "Email Sent (not really, I'm not done)"});
 		});
