@@ -7,6 +7,7 @@ const ObjectId = require("mongodb").ObjectID;
 const index = require("./routes/index");
 const users = require("./routes/users");
 const time = require("./routes/time");
+const resetAccount = require("./routes/reset");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -27,5 +28,6 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use("/", index);
 app.use("/api", users);
 app.use("/time", time);
+app.use("/reset", resetAccount);
 
 

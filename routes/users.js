@@ -19,28 +19,28 @@ router.post("/authenticate/", function(req, res, next){
 	 const password = req.body.password.toString();
 
 	 mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
-			if (err) throw err;
+		if (err) throw err;
 
-			const collection = client.db("usersDb").collection("userInformation");
-			collection.findOne({
-				 $or: [
-						{ "username": username },
-						{ "email": username }
-				 ]
-			}, (error, user) => {
-				 if (error) throw err;
-				 if (!user)
-						return res.status(400).send({ error: "No user found" });
-				 if (!bcrypt.compareSync(password, user.password))
-						return res.status(400).send({ error: "Bad Username / Email and Password combination" });
-				 res.send({
-				 	"company": user.company,
-				 	"email": user.email,
-				 	"username": user.username,
-				 	"isAdmin": user.isAdmin
-				 });
-			});
-			client.close();
+		const collection = client.db("usersDb").collection("userInformation");
+		collection.findOne({
+			 $or: [
+					{ "username": username },
+					{ "email": username }
+			 ]
+		}, (error, user) => {
+			 if (error) throw err;
+			 if (!user)
+					return res.status(400).send({ error: "No user found" });
+			 if (!bcrypt.compareSync(password, user.password))
+					return res.status(400).send({ error: "Bad Username / Email and Password combination" });
+			 res.send({
+			 	"company": user.company,
+			 	"email": user.email,
+			 	"username": user.username,
+			 	"isAdmin": user.isAdmin
+			 });
+		});
+		client.close();
 	 });
 });
 
