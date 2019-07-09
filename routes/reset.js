@@ -16,10 +16,10 @@ router.get('/hello/', function(req, res, next){
 })
 
 router.post('/forgotPassword', function(req, res, next){
-	if (req.body.email == ""){
+	if (!req.body.email || req.body.email == ""){
 		return res.status(400).send({ error: "Email required" });
 	}
-	const email = req.body.email.toString();
+	const email = req.body.email;
 
 	mongoClient.connect(uri, { useNewUrlParser: true }, function (err, client){
 		if (err) throw err;
@@ -29,10 +29,7 @@ router.post('/forgotPassword', function(req, res, next){
 				return res.status(400).send({ error: "Email not recognized"});
 			}
 			return res.send({ message: "Email Sent (not really, I'm not done)"});
-		}).catch((error) => {
-			return res.status(400).send({ error: "Error Caught"});
-			client.close();
-		})
+		});
 	})
 })
 
