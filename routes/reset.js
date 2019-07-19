@@ -1,15 +1,13 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const router = express.Router();
-const ADMIN = 'admin';
-const ADMIN_PWD = 'admin123';
 const mongoClient = require("mongodb");
 const mongoose = require("mongoose");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 // here is where we will handle any database call
-const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
+const uri = process.env.DB_URI;
 
 router.get('/hello/', function(req, res, next){
 	res.send('hitting the reset hello endpoint');

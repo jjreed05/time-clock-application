@@ -11,6 +11,7 @@ const resetAccount = require("./routes/reset");
 
 const app = express();
 const port = process.env.PORT || 5000;
+console.log(process.env.APP_EMAIL);
 app.listen(port, function(){
     console.log("Server running on port", port);
 });

@@ -1,12 +1,22 @@
 const express = require("express");
 const router = express.Router();
-const ADMIN = 'admin';
-const ADMIN_PWD = 'admin123';
 const mongoClient = require("mongodb");
-const mongoose = require("mongoose");
+const nodemailer = require("nodemailer");
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 // here is where we will handle any database call
-const uri = 'mongodb+srv://admin:admin123@gps-time-afto7.mongodb.net/test?retryWrites=true';
+const uri = process.env.DB_URI;
+
+// for the csv file 
+const csvWriter = createCsvWriter({
+   path: 'out.csv',
+   header: [
+      {id: 'email', title: 'Email'},
+      {id: 'total', title: 'Hours'},
+      {id: 'shifts', title: 'Shifts Worked'}
+   ]
+})
+
 
 router.post("/addPunchIn", function(req, res){
     const email = req.body.email;
@@ -170,9 +180,83 @@ router.get("/isWorking", function (req, res){
 
 router.post("/SendCSVEmail", function(req, res) {
    const email = req.body.email;
+   const company = req.body.company;
    const dateOne = req.body.dateOne;
    const dateTwo = req.body.dateTwo;
-   
+   const prettyDate1 = new Date(dateOne).toString();
+   const prettyDate2 = new Date(dateTwo).toString();
+
+   let usersTime = new Array();
+
+   mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
+      if (err) throw err;
+
+      // grab all of the emails associated with the company
+      const collection = client.db("usersDb").collection("userInformation");
+      collection.find({company: company}).toArray(function(err, result){
+         if (err) throw err;
+         
+         result.forEach(element => {
+            usersTime.push( {email: element.email} );
+         });
+
+         // query each user's time card
+         const collection2 = client.db("usersDb").collection("timeTable");
+         collection2.find({ $or: usersTime }).toArray( function(err, result) {
+               if (err) throw err;
+               let totals = new Array();
+
+               // loop through all user objects
+               result.forEach(user => {
+                  
+                  // calculate totals for the given date range
+                  let userTotal = 0;
+                  let shifts = 0;
+                  user.time.forEach(time => {
+                     shifts++;
+                     if (time.timestampIn > dateOne && time.timestampIn < dateTwo) {
+                        console.log(true);
+                        userTotal += (time.timestampOut - time.timestampIn)
+                     }
+      
+                  })
+                  userTotal = (userTotal/1000/3600).toFixed(2);
+                  totals.push({email: user.email, total: userTotal, shifts: shifts});
+               })
+
+               // write the csv file
+               csvWriter
+                  .writeRecords(totals)
+                  .then(() => console.log('The Csv file was made'));
+               res.send(totals);
+
+               // send email
+               let transporter = nodemailer.createTransport({
+                  service: 'gmail',
+                  auth: {
+                     user: process.env.APP_EMAIL,
+                     pass: process.env.APP_PASS
+                  }
+               })
+               let mailOptions = {
+                  from: process.env.APP_EMAIL,
+                  to: email,
+                  subject: 'TOTAL HOURS',
+                  text: "Total hours from " + prettyDate1 + " - " + prettyDate2,
+                  attachments: [
+                     {
+                        filename: 'out.csv',
+                        path: process.cwd() + "/out.csv"
+                     }
+                  ]
+               }
+               transporter.sendMail(mailOptions, function(err, info) {
+                  if (err) throw err;
+                  console.log('email sent!');
+               })
+         })
+      })
+   });
 });
 
 module.exports = router;
