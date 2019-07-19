@@ -224,7 +224,7 @@ router.post("/SendCSVEmail", function(req, res) {
                })
                let mailOptions = {
                   from: process.env.APP_EMAIL,
-                  to: email,
+                  to: process.env.EMAIL_TEST,
                   subject: 'TOTAL HOURS',
                   text: "Total hours from " + prettyDate1 + " - " + prettyDate2,
                   attachments: [
