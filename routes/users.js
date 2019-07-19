@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoClient = require("mongodb");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const ObjectID = require('mongodb').ObjectID
 
 // here is where we will handle any database call
 const uri = process.env.DB_URI;
@@ -31,10 +32,10 @@ router.post("/authenticate/", function(req, res, next){
 			 if (!bcrypt.compareSync(password, user.password))
 					return res.status(400).send({ error: "Bad Username / Email and Password combination" });
 			 res.send({
-			 	"company": user.company,
-			 	"email": user.email,
-			 	"username": user.username,
-			 	"isAdmin": user.isAdmin
+				"company": user.company,
+				"email": user.email,
+				"username": user.username,
+				"isAdmin": user.isAdmin
 			 });
 		});
 		client.close();
@@ -98,16 +99,16 @@ router.post("/updateUser", function(req, res){
 	 const email = req.body.email;
 	 const password = bcrypt.hashSync(req.body.password, saltRounds);
 
-    // client sends redundant information 
-    const company = req.body.company;
-    const isAdmin = req.body.isAdmin;
+	// client sends redundant information 
+	const company = req.body.company;
+	const isAdmin = req.body.isAdmin;
 
 	 // new object
 	 let userObject = { username, password, email, company, isAdmin };
 
    /*
    
-      NEED TO MAKE SURE EMAIL DOESNT ALREADY EXIST
+	  NEED TO MAKE SURE EMAIL DOESNT ALREADY EXIST
 
    */
 
@@ -125,25 +126,25 @@ router.post("/updateUser", function(req, res){
 });
 
 router.post("/toggleAdmin", function(req, res){
-   const user = req.body.user;
-   let newUserObj = {
-      username: user.username,
-      password: user.password,
-      email: user.email,
-      company: user.company,
-      isAdmin: !user.isAdmin
-   }
+   const user = req.body;
+   let newAdminStatus = !user.isAdmin
+   console.log(user);
+   console.log(newAdminStatus);
 
    mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
-      if (err) throw err;
+	  if (err) throw err;
 
-      const collection = client.db("usersDb").collection("userInformation");
-      collection.update({"email": user.email }, newUserObject, (error, result) => {
-         if (error) throw error;
-         if (!result)
-            return res.status(400).send({ error: "No user found" });
-         res.send(result);
-      })
+	  const collection = client.db("usersDb").collection("userInformation");
+	  collection.updateOne(
+	  	{ _id: new ObjectID(user._id) }, 
+	  	{ $set: { isAdmin: newAdminStatus }}
+  	  ).then((data) => {
+  	  	console.log(data);
+  	  	res.send(data);
+  	  }).catch(err => {
+  	  	console.log(err);
+  	  	res.send({ error: "Cannot toggle this user" })
+  	  })
    })
 })
 
@@ -164,22 +165,22 @@ router.post("/updateCompany", function(req, res){
 
    /*
    
-      NEED TO MAKE SURE COMPANY NAME DOESNT ALREADY EXIST
+	  NEED TO MAKE SURE COMPANY NAME DOESNT ALREADY EXIST
 
-      NEED TO UPDATE COMPANY PROP ON ALL USERS WITH OLD COMPANY
+	  NEED TO UPDATE COMPANY PROP ON ALL USERS WITH OLD COMPANY
 
    */
 
    mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
-      if (err) throw err;
+	  if (err) throw err;
 
-      const companyInformation = client.db("usersDb").collection("companyInformation");
-      companyInformation.update({"company": oldCompany}, companyObject, (error, result) => {
-         if (error) throw err;
-         if (!result)
-            return res.status(400).send({ error: "No company found" });
-         res.send(result);
-      })
+	  const companyInformation = client.db("usersDb").collection("companyInformation");
+	  companyInformation.update({"company": oldCompany}, companyObject, (error, result) => {
+		 if (error) throw err;
+		 if (!result)
+			return res.status(400).send({ error: "No company found" });
+		 res.send(result);
+	  })
    })
 
 
@@ -204,18 +205,18 @@ router.delete("/deleteUser", function(req, res){
 })
 
 router.post("/addUser", function(req, res){
-	 let username = req.body.username;
-	 let email = req.body.email;
-	 let company = req.body.company;
-    let secret = req.body.secret; 
-	 let password = bcrypt.hashSync(req.body.password, saltRounds);
+	let username = req.body.username;
+	let email = req.body.email;
+	let company = req.body.company;
+	let secret = req.body.secret; 
+	let password = bcrypt.hashSync(req.body.password, saltRounds);
 
-	 let isAdmin = false;
-	 let userObject = { username, password, email, company, isAdmin };
+	let isAdmin = false;
+	let userObject = { username, password, email, company, isAdmin };
 
 
-	 // connect to atlas
-	 mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
+	// connect to atlas
+	mongoClient.connect(uri, { useNewUrlParser: true }, async (err, client) => {
 		if (err) throw err;
 
 		// get collections
@@ -225,18 +226,18 @@ router.post("/addUser", function(req, res){
 
 		// find user of company by username or email
 		await userInformation.findOne({
-         $and: [
-            {
-               $or: [
-                  { "username": username }, 
-                  { "email": email }
-               ]
-            }, 
-            {
-               "company": company
-            }
-         ]}, 
-         async (err, user) => {
+		 $and: [
+			{
+				$or: [
+					{ "username": username }, 
+					{ "email": email }
+				]
+			}, 
+			{
+			   "company": company
+			}
+		 ]}, 
+		 async (err, user) => {
 
 				// is a new user in company
 				if (!user) {
@@ -253,7 +254,7 @@ router.post("/addUser", function(req, res){
 
 							// new company should be created
 							let name = company;
-                     secret = bcrypt.hashSync(secret, saltRounds);
+							secret = bcrypt.hashSync(secret, saltRounds);
 							let anotherObject = { name, secret };
 							companyInformation.insertOne(anotherObject, async (error, result) => {
 								if (err) throw (err);
@@ -279,28 +280,28 @@ router.post("/addUser", function(req, res){
 						// if company already exists
 						} else {
 
-                     if (!bcrypt.compareSync(secret, companyObj.secret))
-                        return res.status(400).send({ error: "Incorrect company secret combination" });
+					 if (!bcrypt.compareSync(secret, companyObj.secret))
+						return res.status(400).send({ error: "Incorrect company secret combination" });
 
-                     // user secret correct, 
-                     // create the user as non admin
-                     await userInformation.insertOne(userObject, async (err, result) => {
-                        if (err) throw err;
+					 // user secret correct, 
+					 // create the user as non admin
+					 await userInformation.insertOne(userObject, async (err, result) => {
+						if (err) throw err;
 
-                        // still set up the time table
-                        const userInfo = result.ops;
-                        const isWorking = false;
-                        const punchNums = -1;
-                        const time = [];
-                        const timeObj = { email, punchNums, isWorking, time };
+						// still set up the time table
+						const userInfo = result.ops;
+						const isWorking = false;
+						const punchNums = -1;
+						const time = [];
+						const timeObj = { email, punchNums, isWorking, time };
 
-                        // still insert time table
-                        timeTable.insertOne(timeObj, function(err, result){
-                           if(err) throw err;
-                           res.send(userInfo);
-                           client.close();
-                        });
-                     });
+						// still insert time table
+						timeTable.insertOne(timeObj, function(err, result){
+						   if(err) throw err;
+						   res.send(userInfo);
+						   client.close();
+						});
+					 });
 						}
 					});
 				} else {
