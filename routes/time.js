@@ -152,20 +152,4 @@ router.get('/getPunches', function (req, res){
    })
 })
 
-router.get("/isWorking", function (req, res){
-    const email = req.body.email;
-
-    // connect to the database
-    mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client) {
-        if (err) throw err;
-
-        const collection = client.db("usersDb").collection("timeTable");
-        collection.findOne({email: email}, function(err, result){
-            if (err) throw err;
-            res.send(result.isWorking);
-            client.close();
-        });
-    });
-});
-
 module.exports = router;
