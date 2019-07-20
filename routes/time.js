@@ -212,7 +212,7 @@ router.post("/SendCSVEmail", function(req, res) {
 
                // write the csv file
                var fs = require('fs');
-               fs.truncate(process.cwd() + "/out.csv", '', function (){
+               fs.truncate(process.cwd() + "/out.csv", 0, function (){
                   csvWriter
                   .writeRecords(totals)
                   .then(() => console.log('The Csv file was made'));
