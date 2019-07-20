@@ -202,7 +202,6 @@ router.post("/SendCSVEmail", function(req, res) {
                   user.time.forEach(time => {
                      shifts++;
                      if (time.timestampIn > dateOne && time.timestampIn < dateTwo) {
-                        console.log(true);
                         userTotal += (time.timestampOut - time.timestampIn)
                      }
       
@@ -212,10 +211,13 @@ router.post("/SendCSVEmail", function(req, res) {
                })
 
                // write the csv file
-               csvWriter
+               var fs = require('fs');
+               fs.truncate(process.cwd() + "/out.csv", '', function (){
+                  csvWriter
                   .writeRecords(totals)
                   .then(() => console.log('The Csv file was made'));
-               res.send(totals);
+                  res.send(totals);
+               })
 
                // send email
                let transporter = nodemailer.createTransport({
