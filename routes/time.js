@@ -7,16 +7,6 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 // here is where we will handle any database call
 const uri = process.env.DB_URI;
 
-// for the csv file 
-const csvWriter = createCsvWriter({
-   path: 'out.csv',
-   header: [
-      {id: 'email', title: 'Email'},
-      {id: 'total', title: 'Hours'},
-      {id: 'shifts', title: 'Shifts Worked'}
-   ]
-})
-
 
 router.post("/addPunchIn", function(req, res){
     const email = req.body.email;
@@ -213,6 +203,15 @@ router.post("/SendCSVEmail", function(req, res) {
                // write the csv file
                var fs = require('fs');
                fs.truncate(process.cwd() + "/out.csv", 0, function (){
+                  // for the csv file 
+                  const csvWriter = createCsvWriter({
+                     path: 'out.csv',
+                     header: [
+                        {id: 'email', title: 'Email'},
+                        {id: 'total', title: 'Hours'},
+                        {id: 'shifts', title: 'Shifts Worked'}
+                     ]
+                  })
                   csvWriter
                   .writeRecords(totals)
                   .then(() => console.log('The Csv file was made'));
