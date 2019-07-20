@@ -173,12 +173,14 @@ router.post("/SendCSVEmail", function(req, res) {
    let usersTime = new Array();
 
    mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
-      if (err) throw err;
+      if (err)
+         res.status(400).send({ error: "Could not connect to DB" });
 
       // grab all of the emails associated with the company
       const collection = client.db("usersDb").collection("userInformation");
       collection.find({company: company}).toArray(function(err, result){
-         if (err) throw err;
+         if (err)
+            res.status(400).send({ error: "Could not find company information" });
          
          result.forEach(element => {
             usersTime.push( {email: element.email} );
@@ -187,7 +189,8 @@ router.post("/SendCSVEmail", function(req, res) {
          // query each user's time card
          const collection2 = client.db("usersDb").collection("timeTable");
          collection2.find({ $or: usersTime }).toArray( function(err, result) {
-               if (err) throw err;
+            if (err)
+               res.status(400).send({ error: "Time table" });
                let totals = new Array();
 
                // loop through all user objects
@@ -235,8 +238,10 @@ router.post("/SendCSVEmail", function(req, res) {
                   ]
                }
                transporter.sendMail(mailOptions, function(err, info) {
-                  if (err) throw err;
+                  if (err)
+                     res.status(400).send({ error: "Could not send email" });
                   console.log('email sent!');
+                  res.send({ success: "Email Sent!"})
                })
          })
       })
