@@ -123,7 +123,7 @@ router.post("/updateUser", function(req, res){
 						 res.send(userObject);
 					})
 				}
-			}
+			});
 			
 
 	 });
