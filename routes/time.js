@@ -216,7 +216,7 @@ router.post("/SendCSVEmail", function(req, res) {
                   .writeRecords(totals)
                   .then(() => console.log('The Csv file was made'));
                   res.send(totals);
-               })
+               });
 
                // send email
                let transporter = nodemailer.createTransport({
@@ -225,7 +225,8 @@ router.post("/SendCSVEmail", function(req, res) {
                      user: process.env.APP_EMAIL,
                      pass: process.env.APP_PASS
                   }
-               })
+               });
+
                let mailOptions = {
                   from: process.env.APP_EMAIL,
                   to: email,
