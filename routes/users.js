@@ -103,25 +103,29 @@ router.post("/updateUser", function(req, res){
 	const company = req.body.company;
 	const isAdmin = req.body.isAdmin;
 
-	 // new object
-	 let userObject = { username, password, email, company, isAdmin };
+	// new object
+	let userObject = { username, password, email, company, isAdmin };
 
-   /*
-   
-	  NEED TO MAKE SURE EMAIL DOESNT ALREADY EXIST
-
-   */
 
 	 mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
 			if (err) throw err;
 
 			const collection = client.db("usersDb").collection("userInformation");
-			collection.update({"email": oldEmail}, userObject, (error, result) => {
-				 if (error) throw error;
-				 if (!result)
-						return res.status(400).send({ error: "No user found" });
-				 res.send(result);
-			})
+			
+			collection.findOne({"email": email }, (error, result) => {
+				if (result){
+					return res.status.(400).send({ error: "user with that email already exists" });
+				} else {
+					collection.update({"email": oldEmail}, userObject, (error, result) => {
+						 if (error) throw error;
+						 if (!result)
+								return res.status(400).send({ error: "No user found" });
+						 res.send(result);
+					})
+				}
+			}
+			
+
 	 });
 });
 

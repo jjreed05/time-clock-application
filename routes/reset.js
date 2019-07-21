@@ -28,30 +28,39 @@ router.post('/forgotPassword', function(req, res, next){
 			} else {
 				const newPassword = generateRandomPassword();
 
-				let transporter = nodemailer.createTransport({
-				  service: 'gmail',
-				  auth: {
-				     user: process.env.APP_EMAIL,
-				     pass: process.env.APP_PASS
-				  }
-				})
+				collection.updateOne({"email": email}, { $set: { password: newPassword }})
+				.then((error, result) => {
+					 if (error) throw error;
+					 if (!result)
+							return res.status(400).send({ error: "No user found" });
+					 else {
+						let transporter = nodemailer.createTransport({
+						  service: 'gmail',
+						  auth: {
+						     user: process.env.APP_EMAIL,
+						     pass: process.env.APP_PASS
+						  }
+						})
 
-				let mailOptions = {
-					from: process.env.APP_EMAIL,
-					to: email,
-					subject: "Link To Reset Password",
-					text: 
-					`You are receiving this because you (or someone else) have requested the reset of the password for you account.\n\n` +
-					`Your password has been temporarily reset to: ${newPassword}\n\n` +
-					`Please reset your password as soon as you are able\n\n`,
-				}
+						let mailOptions = {
+							from: process.env.APP_EMAIL,
+							to: email,
+							subject: "Link To Reset Password",
+							text: 
+							`You are receiving this because you (or someone else) have requested the reset of the password for you account.\n\n` +
+							`Your password has been temporarily reset to: ${newPassword}\n\n` +
+							`Please reset your password as soon as you are able\n\n`,
+						}
 
-				transporter.sendMail(mailOptions, function(err, res){
-					if (err)
-						return res.status(400).send({ message: "Failed to send email"});
-					else 
-						return res.send({ message: "Email Sent (but it's not actually working totally)"});
-				})
+
+						transporter.sendMail(mailOptions, function(err, res){
+							if (err)
+								return res.status(400).send({ message: "Failed to send email"});
+							res.send({ message: "Email Sent (but it's not actually working totally)"});
+						})
+					}
+				});
+
 			}
 
 			
