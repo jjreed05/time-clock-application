@@ -113,7 +113,7 @@ router.post("/updateUser", function(req, res){
 			const collection = client.db("usersDb").collection("userInformation");
 			
 			collection.findOne({"email": email }, (error, result) => {
-				if (result){
+				if (result && oldEmail != email){
 					return res.status(400).send({ error: "user with that email already exists" });
 				} else {
 					collection.update({"email": oldEmail}, userObject, (error, result) => {
