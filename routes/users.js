@@ -120,7 +120,7 @@ router.post("/updateUser", function(req, res){
 						 if (error) throw error;
 						 if (!result)
 								return res.status(400).send({ error: "No user found" });
-						 res.send(result);
+						 res.send(userObject);
 					})
 				}
 			}
