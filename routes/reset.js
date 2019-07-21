@@ -70,7 +70,13 @@ router.post('/forgotPassword', function(req, res, next){
 })
 
 const generateRandomPassword = () => {
-	return 'testresetpassword';
+	const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
+	let newPassword = "";
+	for ( let i = 0; i < 12; i++){
+		let ind = Math.floor(Math.random() * characters.length);
+		newPassword += characters[ind];
+    }
+	return newPassword;
 }
 
 module.exports = router;
