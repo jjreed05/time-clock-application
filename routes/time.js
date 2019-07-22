@@ -218,7 +218,6 @@ router.post("/SendCSVEmail", function(req, res) {
                   csvWriter
                   .writeRecords(totals)
                   .then(() => console.log('The Csv file was made'));
-                  res.send(totals);
                });
 
                // send email
