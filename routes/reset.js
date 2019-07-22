@@ -28,50 +28,41 @@ router.post('/forgotPassword', function(req, res, next){
 			} else {
 				const newPassword = generateRandomPassword();
 				const hashedPassword = bcrypt.hashSync(newPassword, saltRounds);
-				collection.updateOne({"email": user.email}, { $set: { password: hashedPassword }})
-				.then((error, result) => {
-					 if (error) {
-					 	return res.status(400).send(error);
-					 }
-					 
-					 if (!result){
-							return res.status(400).send({ message: "No user found" });
-					 } else {
-						let transporter = nodemailer.createTransport({
-						  service: 'gmail',
-						  auth: {
-						     user: process.env.APP_EMAIL,
-						     pass: process.env.APP_PASS
-						  }
-						})
+				try {
+					collection.updateOne({"email": user.email}, { $set: { password: hashedPassword }})
+					let transporter = nodemailer.createTransport({
+					  service: 'gmail',
+					  auth: {
+					     user: process.env.APP_EMAIL,
+					     pass: process.env.APP_PASS
+					  }
+					})
 
-						let mailOptions = {
-							from: process.env.APP_EMAIL,
-							to: email,
-							subject: "Link To Reset Password",
-							text: 
-							`You are receiving this because you (or someone else) have requested the reset of the password for you account.\n\n` +
-							`Your password has been temporarily reset to: ${newPassword}\n\n` +
-							`Please reset your password as soon as you are able\n\n`,
-						}
-
-						// something broken above this line 
-						transporter.sendMail(mailOptions, function(err, result){
-							if (err){
-								return res.status(400).send({ message: "Failed to send email", info: result });
-							} else {
-								return res.send({ message: "Email Sent (but it's not actually working totally)", info: result });
-							}
-						})
+					let mailOptions = {
+						from: process.env.APP_EMAIL,
+						to: email,
+						subject: "Link To Reset Password",
+						text: 
+						`You are receiving this because you (or someone else) have requested the reset of the password for you account.\n\n` +
+						`Your password has been temporarily reset to: ${newPassword}\n\n` +
+						`Please reset your password as soon as you are able\n\n`,
 					}
-				});
 
-			}
-
+					// something broken above this line 
+					transporter.sendMail(mailOptions, function(err, result){
+						if (err){
+							return res.status(400).send({ message: "Failed to send email", info: result });
+						} else {
+							return res.send({ message: "Email Sent (but it's not actually working totally)", info: result });
+						}
+					})
+				} catch (error) {
+					res.status(400).send({ message: "Couldn't reset password"});
+				}
+			};
 			
 		});
 	})
-
 })
 
 const generateRandomPassword = () => {
