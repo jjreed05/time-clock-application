@@ -19,21 +19,26 @@ router.post('/forgotPassword', function(req, res, next){
 	}
 	const email = req.body.email;
 
-	mongoClient.connect(uri, { useNewUrlParser: true }, function (err, client){
+	 mongoClient.connect(uri, { useNewUrlParser: true }, function(err, client){
 		if (err) throw err;
 		const collection = client.db("usersDb").collection("userInformation");
 		collection.findOne({ email: email }, (error, user) => {
 			if (user == null){
 				return res.status(400).send({ message: "Email not recognized"});
 			} else {
+				return res.send({ message: "Debug step 1"});
 				const newPassword = generateRandomPassword();
-
+				return res.send({ message: "Debug step 2"});
 				collection.updateOne({"email": email}, { $set: { password: newPassword }})
 				.then((error, result) => {
-					 if (error) throw error;
-					 if (!result)
+					 if (error) {
+					 	throw error;
+					 }
+					 return res.send({ message: "Debug step 3"});
+					 
+					 if (!result){
 							return res.status(400).send({ message: "No user found" });
-					 else {
+					 } else {
 						let transporter = nodemailer.createTransport({
 						  service: 'gmail',
 						  auth: {

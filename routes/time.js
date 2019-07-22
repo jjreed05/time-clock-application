@@ -179,8 +179,9 @@ router.post("/SendCSVEmail", function(req, res) {
          // query each user's time card
          const collection2 = client.db("usersDb").collection("timeTable");
          collection2.find({ $or: usersTime }).toArray( function(err, result) {
-            if (err)
-               res.status(400).send({ error: "Time table" });
+               if (err){
+                return res.status(400).send({ error: "Time table" });
+               }
                let totals = new Array();
 
                // loop through all user objects
