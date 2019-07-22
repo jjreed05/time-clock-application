@@ -127,19 +127,20 @@ router.post("/updateUser", function(req, res){
 							 }, message: "User updated Successfully"});
 						});
 					} else {
-						collection.updateOne({"email": oldEmail}, { 
-							$set: {
-								"username": username,
-								"email": email,
-						}, (error, result) => {
-							 if (error) throw error;
-							 if (!result)
-								return res.status(400).send({ error: "No user found" });
-							 res.send({ user: {
-							 	username: username,
-							 	email: email
-							 }, message: "User updated Successfully"});
-						});
+						try {
+							collection.updateOne({"email": oldEmail}, { 
+								$set: {
+									"username": username,
+									"email": email,
+								}
+							});
+							res.send({ user: {
+								username: username,
+								email: email
+							}, message: "User updated Successfully"});
+						} catch (error) {
+							return res.status(400).send({ error: "No user found" });
+						}
 					}
 				}
 			});
