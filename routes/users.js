@@ -115,7 +115,7 @@ router.post("/updateUser", function(req, res){
 			
 			collection.findOne({"email": email }, (error, result) => {
 				if (result && oldEmail != email){
-					return res.status(400).send({ error: "User with that email already exists" });
+					return res.status(400).send({ message: "User with that email already exists" });
 				} else {
 					collection.update({"email": oldEmail}, userObject, (error, result) => {
 						 if (error) throw error;
