@@ -27,13 +27,12 @@ router.post('/forgotPassword', function(req, res, next){
 				return res.status(400).send({ message: "Email not recognized"});
 			} else {
 				const newPassword = generateRandomPassword();
-				return res.send({ message: "Debug step 2"});
 				collection.updateOne({"email": email}, { $set: { password: newPassword }})
 				.then((error, result) => {
 					 if (error) {
 					 	throw error;
 					 }
-					 return res.send({ message: "Debug step 3"});
+					 //return res.send({ message: "Debug step 3"});
 					 
 					 if (!result){
 							return res.status(400).send({ message: "No user found" });
@@ -56,7 +55,7 @@ router.post('/forgotPassword', function(req, res, next){
 							`Please reset your password as soon as you are able\n\n`,
 						}
 
-
+						return res.send({ message: "everything works above transporter"});
 						transporter.sendMail(mailOptions, function(err, result){
 							if (err){
 								return res.status(400).send({ message: "Failed to send email", info: result });
