@@ -30,9 +30,8 @@ router.post('/forgotPassword', function(req, res, next){
 				collection.updateOne({"email": email}, { $set: { password: newPassword }})
 				.then((error, result) => {
 					 if (error) {
-					 	throw error;
+					 	return res.status(400).send({ message: error.message });
 					 }
-					 return res.send({ message: "Debug step 3"});
 					 
 					 if (!result){
 							return res.status(400).send({ message: "No user found" });
