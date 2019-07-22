@@ -26,7 +26,6 @@ router.post('/forgotPassword', function(req, res, next){
 			if (user == null){
 				return res.status(400).send({ message: "Email not recognized"});
 			} else {
-				return res.send({ message: "Debug step 1"});
 				const newPassword = generateRandomPassword();
 				return res.send({ message: "Debug step 2"});
 				collection.updateOne({"email": email}, { $set: { password: newPassword }})
