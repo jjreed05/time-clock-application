@@ -95,18 +95,12 @@ router.post("/updateUser", function(req, res){
 	 const oldEmail = req.body.oldEmail;
 
 	 // passed params to update
-	 const username = req.body.username;
-	 const email = req.body.email;
-	 const password = bcrypt.hashSync(req.body.password, saltRounds);
-
-	// client sends redundant information 
-	const company = req.body.company;
-	const isAdmin = req.body.isAdmin;
-
-	// new object
-	let userObject = { username, password, email, company, isAdmin };
-	console.log('userObject', userObject);
-
+	const username = req.body.username;
+	const email = req.body.email;
+	let password = null;
+	if (req.body.password){
+		password = bcrypt.hashSync(req.body.password, saltRounds);
+	}
 
 	 mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
 			if (err) throw err;
@@ -117,12 +111,36 @@ router.post("/updateUser", function(req, res){
 				if (result && oldEmail != email){
 					return res.status(400).send({ message: "User with that email already exists" });
 				} else {
-					collection.update({"email": oldEmail}, userObject, (error, result) => {
-						 if (error) throw error;
-						 if (!result)
-							return res.status(400).send({ error: "No user found" });
-						 res.send({ user: userObject, message: "User updated Successfully"});
-					})
+					if (password){
+						collection.updateOne({"email": oldEmail}, { 
+							$set: {
+								"username": username,
+								"email": email,
+								"password": password,
+							}}, (error, result) => {
+							 if (error) throw error;
+							 if (!result)
+								return res.status(400).send({ error: "No user found" });
+							 res.send({ user: {
+							 	username: username,
+							 	email: email,
+							 }, message: "User updated Successfully"});
+						});
+					} else {
+						collection.updateOne({"email": oldEmail}, { 
+							$set: {
+								"username": username,
+								"email": email,
+						}, (error, result) => {
+							 if (error) throw error;
+							 if (!result)
+								return res.status(400).send({ error: "No user found" });
+							 res.send({ user: {
+							 	username: username,
+							 	email: email
+							 }, message: "User updated Successfully"});
+						});
+					}
 				}
 			});
 			
