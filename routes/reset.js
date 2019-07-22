@@ -27,10 +27,11 @@ router.post('/forgotPassword', function(req, res, next){
 				return res.status(400).send({ message: "Email not recognized"});
 			} else {
 				const newPassword = generateRandomPassword();
-				collection.updateOne({"email": email}, { $set: { password: newPassword }})
+				const hashedPassword = bcrypt.hashSync(newPassword, saltRounds);
+				collection.updateOne({"email": user.email}, { $set: { password: hashedPassword }})
 				.then((error, result) => {
 					 if (error) {
-					 	return res.status(400).send({ message: error.message });
+					 	return res.status(400).send(error);
 					 }
 					 
 					 if (!result){
