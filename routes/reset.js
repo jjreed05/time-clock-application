@@ -32,7 +32,7 @@ router.post('/forgotPassword', function(req, res, next){
 					 if (error) {
 					 	throw error;
 					 }
-					 //return res.send({ message: "Debug step 3"});
+					 return res.send({ message: "Debug step 3"});
 					 
 					 if (!result){
 							return res.status(400).send({ message: "No user found" });
@@ -55,7 +55,7 @@ router.post('/forgotPassword', function(req, res, next){
 							`Please reset your password as soon as you are able\n\n`,
 						}
 
-						return res.send({ message: "everything works above transporter"});
+						// something broken above this line 
 						transporter.sendMail(mailOptions, function(err, result){
 							if (err){
 								return res.status(400).send({ message: "Failed to send email", info: result });
