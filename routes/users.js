@@ -105,6 +105,7 @@ router.post("/updateUser", function(req, res){
 
 	// new object
 	let userObject = { username, password, email, company, isAdmin };
+	console.log('userObject', userObject);
 
 
 	 mongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {

@@ -240,10 +240,12 @@ router.post("/SendCSVEmail", function(req, res) {
                   ]
                }
                transporter.sendMail(mailOptions, function(err, info) {
-                  if (err)
-                     res.status(400).send({ error: "Could not send email" });
-                  console.log('email sent!');
-                  res.send({ success: "Email Sent!"})
+                  if (err){
+                    return res.status(400).send({ error: "Could not send email", info: info });
+                  } else {
+                    console.log('email sent!');
+                    return res.send({ success: "Email Sent!", info: info});
+                  } 
                })
          })
       })

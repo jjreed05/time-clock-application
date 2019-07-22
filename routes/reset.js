@@ -32,7 +32,7 @@ router.post('/forgotPassword', function(req, res, next){
 				.then((error, result) => {
 					 if (error) throw error;
 					 if (!result)
-							return res.status(400).send({ error: "No user found" });
+							return res.status(400).send({ message: "No user found" });
 					 else {
 						let transporter = nodemailer.createTransport({
 						  service: 'gmail',
@@ -53,10 +53,12 @@ router.post('/forgotPassword', function(req, res, next){
 						}
 
 
-						transporter.sendMail(mailOptions, function(err, res){
-							if (err)
-								return res.status(400).send({ message: "Failed to send email"});
-							res.send({ message: "Email Sent (but it's not actually working totally)"});
+						transporter.sendMail(mailOptions, function(err, result){
+							if (err){
+								return res.status(400).send({ message: "Failed to send email", info: result });
+							} else {
+								return res.send({ message: "Email Sent (but it's not actually working totally)", info: result });
+							}
 						})
 					}
 				});
